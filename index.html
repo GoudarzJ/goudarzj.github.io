@@ -1,0 +1,960 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goudarz Javadi Zadeh — Flutter & Mobile Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d0f;
+      --bg2:       #111115;
+      --bg3:       #18181e;
+      --border:    rgba(255,255,255,0.07);
+      --gold:      #e8a838;
+      --gold-dim:  rgba(232,168,56,0.15);
+      --gold-glow: rgba(232,168,56,0.35);
+      --text:      #e8e6e0;
+      --muted:     #6e6c68;
+      --muted2:    #9c9a94;
+      --white:     #ffffff;
+      --mono:      'JetBrains Mono', monospace;
+      --display:   'Syne', sans-serif;
+      --serif:     'Spectral', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--display);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Custom Cursor ── */
+    #cursor {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      pointer-events: none;
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .15s, height .15s, background .15s;
+      mix-blend-mode: normal;
+    }
+    #cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      pointer-events: none;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(232,168,56,0.5);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: transform .08s ease, width .2s, height .2s, border-color .2s;
+    }
+    body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 6px; height: 6px; }
+    body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring {
+      width: 56px; height: 56px; border-color: var(--gold);
+    }
+
+    /* ── Canvas Background ── */
+    #canvas-bg {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: .35;
+    }
+
+    /* ── Layout Helpers ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    section { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid transparent;
+      transition: border-color .3s, background .3s, backdrop-filter .3s;
+    }
+    nav.scrolled {
+      border-color: var(--border);
+      background: rgba(13,13,15,0.85);
+      backdrop-filter: blur(16px);
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--gold);
+      letter-spacing: .08em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted2);
+      text-decoration: none;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 80px;
+      padding: 120px 48px 80px;
+    }
+    .hero-left { position: relative; }
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: var(--gold);
+    }
+    h1.hero-name {
+      font-size: clamp(52px, 6vw, 88px);
+      font-weight: 800;
+      line-height: .96;
+      letter-spacing: -.03em;
+      color: var(--white);
+      margin-bottom: 8px;
+    }
+    h1.hero-name span { color: var(--gold); }
+    .hero-title {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(18px, 2vw, 26px);
+      color: var(--muted2);
+      margin-bottom: 40px;
+    }
+    .hero-desc {
+      font-size: 16px;
+      line-height: 1.75;
+      color: var(--muted2);
+      max-width: 440px;
+      margin-bottom: 52px;
+    }
+    .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--gold);
+      color: #0d0d0f;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary:hover { background: #f0b840; transform: translateY(-2px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: transparent;
+      color: var(--muted2);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color .2s, color .2s, transform .15s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    /* Hero Right — Stats + Visual */
+    .hero-right {
+      display: flex; flex-direction: column; gap: 24px;
+      position: relative;
+    }
+    .hero-stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    }
+    .stat-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .3s;
+    }
+    .stat-card:hover { border-color: var(--gold-glow); }
+    .stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .4s ease;
+    }
+    .stat-card:hover::after { transform: scaleX(1); }
+    .stat-num {
+      font-size: 52px; font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+    .stat-num span { color: var(--gold); font-size: 32px; }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+    .hero-availability {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted2);
+      letter-spacing: .08em;
+    }
+    .avail-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 10px #4ade80;
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 6px #4ade80; }
+      50% { box-shadow: 0 0 16px #4ade80, 0 0 30px rgba(74,222,128,.3); }
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 20px 0;
+      background: var(--bg2);
+      position: relative; z-index: 1;
+    }
+    .marquee-track {
+      display: flex; gap: 0;
+      animation: marquee 30s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 24px;
+      padding: 0 40px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .marquee-item span { color: var(--gold); font-size: 16px; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 64px;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+    .section-rule {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+
+    /* ── ABOUT ── */
+    #about { padding: 120px 48px; }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 17px; line-height: 1.8;
+      color: var(--muted2);
+      margin-bottom: 24px;
+    }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .about-text p em { color: var(--gold); font-style: normal; }
+    .skills-grid {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .skill-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 20px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      transition: border-color .25s, background .25s;
+      cursor: default;
+    }
+    .skill-row:hover { border-color: var(--gold-glow); background: var(--bg3); }
+    .skill-icon { font-size: 18px; width: 24px; text-align: center; }
+    .skill-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      flex: 1;
+    }
+    .skill-bar-wrap {
+      width: 80px; height: 2px;
+      background: rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .skill-bar {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: var(--gold);
+      transition: width 1s ease;
+    }
+    .skill-pct {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      width: 32px;
+      text-align: right;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { padding: 120px 48px; background: var(--bg2); }
+    .projects-grid {
+      display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px;
+    }
+    .project-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 40px 36px;
+      position: relative; overflow: hidden;
+      transition: border-color .3s, transform .3s;
+      cursor: default;
+    }
+    .project-card:hover { border-color: rgba(232,168,56,.4); transform: translateY(-4px); }
+    .project-card::before {
+      content: '';
+      position: absolute; top: 0; left: 0; right: 0; height: 1px;
+      background: linear-gradient(to right, transparent, var(--gold), transparent);
+      opacity: 0; transition: opacity .3s;
+    }
+    .project-card:hover::before { opacity: 1; }
+    .project-num {
+      font-family: var(--mono);
+      font-size: 11px; color: var(--gold);
+      letter-spacing: .15em; margin-bottom: 24px;
+    }
+    .project-name {
+      font-size: 22px; font-weight: 700;
+      color: var(--white); margin-bottom: 12px;
+      letter-spacing: -.02em;
+    }
+    .project-desc {
+      font-size: 14px; line-height: 1.7;
+      color: var(--muted2); margin-bottom: 28px;
+    }
+    .project-tags {
+      display: flex; flex-wrap: wrap; gap: 8px;
+      margin-bottom: 32px;
+    }
+    .tag {
+      font-family: var(--mono);
+      font-size: 10px; letter-spacing: .1em; text-transform: uppercase;
+      padding: 5px 12px;
+      background: var(--gold-dim);
+      color: var(--gold);
+      border: 1px solid rgba(232,168,56,.25);
+    }
+    .project-arrow {
+      font-family: var(--mono);
+      font-size: 12px; color: var(--muted);
+      display: flex; align-items: center; gap: 8px;
+      transition: color .2s, gap .2s;
+    }
+    .project-card:hover .project-arrow { color: var(--gold); gap: 14px; }
+
+    /* Featured card (first one) */
+    .project-card.featured {
+      grid-column: span 2;
+      background: linear-gradient(135deg, var(--bg3) 0%, #1a1a22 100%);
+    }
+    .project-card.featured .project-name { font-size: 32px; }
+
+    /* ── EXPERIENCE ── */
+    #experience { padding: 120px 48px; }
+    .exp-list { display: flex; flex-direction: column; gap: 2px; }
+    .exp-item {
+      display: grid; grid-template-columns: 200px 1fr;
+      gap: 40px;
+      padding: 36px 40px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      transition: border-color .25s;
+    }
+    .exp-item:hover { border-color: rgba(232,168,56,.3); }
+    .exp-period {
+      font-family: var(--mono);
+      font-size: 12px; color: var(--muted);
+      letter-spacing: .08em;
+      padding-top: 4px;
+    }
+    .exp-role {
+      font-size: 20px; font-weight: 700;
+      color: var(--white); margin-bottom: 6px;
+      letter-spacing: -.02em;
+    }
+    .exp-company {
+      font-family: var(--mono);
+      font-size: 13px; color: var(--gold);
+      margin-bottom: 16px; letter-spacing: .05em;
+    }
+    .exp-bullets {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .exp-bullets li {
+      font-size: 14px; line-height: 1.65;
+      color: var(--muted2);
+      padding-left: 18px;
+      position: relative;
+    }
+    .exp-bullets li::before {
+      content: '›';
+      position: absolute; left: 0;
+      color: var(--gold);
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 120px 48px;
+      background: var(--bg2);
+      text-align: center;
+    }
+    .contact-inner { max-width: 640px; margin: 0 auto; }
+    .contact-eyebrow {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--gold); letter-spacing: .2em;
+      text-transform: uppercase; margin-bottom: 24px;
+    }
+    .contact-heading {
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 800; letter-spacing: -.04em;
+      color: var(--white); line-height: .95;
+      margin-bottom: 24px;
+    }
+    .contact-heading em {
+      font-style: italic; font-family: var(--serif);
+      font-weight: 300; color: var(--gold);
+    }
+    .contact-desc {
+      font-size: 16px; line-height: 1.75;
+      color: var(--muted2); margin-bottom: 48px;
+    }
+    .contact-links {
+      display: flex; justify-content: center;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 12px;
+      color: var(--muted2); text-decoration: none;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      transition: border-color .2s, color .2s;
+    }
+    .contact-link:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      position: relative; z-index: 1;
+    }
+    footer span {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted); letter-spacing: .08em;
+    }
+    footer .footer-gold { color: var(--gold); }
+
+    /* ── ANIMATIONS ── */
+    .reveal {
+      opacity: 0; transform: translateY(32px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 60px; }
+      .hero-stat-grid { grid-template-columns: 1fr 1fr; }
+      #about, #projects, #experience, #contact { padding: 80px 24px; }
+      .about-grid { grid-template-columns: 1fr; gap: 48px; }
+      .projects-grid { grid-template-columns: 1fr; }
+      .project-card.featured { grid-column: span 1; }
+      .exp-item { grid-template-columns: 1fr; gap: 12px; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="canvas-bg"></canvas>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">GJZ<span style="color:var(--muted)">_</span>DEV</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow reveal">Senior Software Developer</div>
+      <h1 class="hero-name reveal reveal-delay-1">
+        Goudarz<br/><span>Javadi</span><br/>Zadeh
+      </h1>
+      <p class="hero-title reveal reveal-delay-2">Flutter Architect &amp; Real-Time Systems Engineer</p>
+      <p class="hero-desc reveal reveal-delay-3">
+        25+ years crafting digital products across mobile, backend, and real-time systems.
+        I specialise in Flutter/Dart, live voice &amp; video platforms, and full-stack integrations
+        that scale — from concept to production.
+      </p>
+      <div class="hero-ctas reveal reveal-delay-4">
+        <a href="#projects" class="btn-primary">View Projects →</a>
+        <a href="#contact" class="btn-secondary">Let's Talk</a>
+      </div>
+    </div>
+
+    <div class="hero-right reveal reveal-delay-2">
+      <div class="hero-stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">20<span>+</span></div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">150<span>k+</span></div>
+          <div class="stat-label">Users Served</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">6</div>
+          <div class="stat-label">Companies</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">30<span>M+</span></div>
+          <div class="stat-label">Records Processed</div>
+        </div>
+      </div>
+      <div class="hero-availability">
+        <div class="avail-dot"></div>
+        Available for freelance &amp; consulting engagements
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marqueeTrack">
+      <!-- duplicated for infinite scroll -->
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">01 — About</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p class="reveal">
+            I'm a <strong>senior software developer with 20+ years of experience</strong>, based in Istanbul.
+            My career spans real-time social platforms, enterprise ERP systems, fintech apps, and large-scale data
+            solutions — built with precision, performance, and clean architecture at the forefront.
+          </p>
+          <p class="reveal reveal-delay-1">
+            Today I focus on <em>Flutter &amp; real-time systems</em> — building cross-platform mobile products
+            that feel native, backed by rock-solid backends. From 150,000-user reservation platforms to live
+            WebRTC social apps, I own the full stack when needed.
+          </p>
+          <p class="reveal reveal-delay-2">
+            I started mobile before cross-platform frameworks even existed — writing Objective-C readers for
+            bookshops in 2010. That foundation means I understand the platform deeply, not just the framework.
+            <strong>I don't just write code. I architect systems that last.</strong>
+          </p>
+        </div>
+        <div class="skills-grid reveal reveal-delay-1">
+          <div class="skill-row"><span class="skill-icon">📱</span><span class="skill-name">Flutter / Dart</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:97%"></div></div><span class="skill-pct">97%</span></div>
+          <div class="skill-row"><span class="skill-icon">⚡</span><span class="skill-name">WebSocket / WebRTC</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div><span class="skill-pct">90%</span></div>
+          <div class="skill-row"><span class="skill-icon">🔴</span><span class="skill-name">Riverpod / State Mgmt</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:93%"></div></div><span class="skill-pct">93%</span></div>
+          <div class="skill-row"><span class="skill-icon">🎥</span><span class="skill-name">LiveKit / Real-Time AV</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div><span class="skill-pct">85%</span></div>
+          <div class="skill-row"><span class="skill-icon">🗄️</span><span class="skill-name">SQL Server / .NET Core</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:92%"></div></div><span class="skill-pct">92%</span></div>
+          <div class="skill-row"><span class="skill-icon">⚙️</span><span class="skill-name">C# / ASP.NET Web API</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div><span class="skill-pct">88%</span></div>
+          <div class="skill-row"><span class="skill-icon">🐍</span><span class="skill-name">Python / FastAPI</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:70%"></div></div><span class="skill-pct">70%</span></div>
+          <div class="skill-row"><span class="skill-icon">🌐</span><span class="skill-name">Next.js / React</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div><span class="skill-pct">75%</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">02 — Projects</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="projects-grid">
+
+        <!-- Featured -->
+        <div class="project-card featured reveal">
+          <div class="project-num">01 — Flagship</div>
+          <div class="project-name">VIBE — Real-Time Social Platform</div>
+          <div class="project-desc">
+            A full-featured social platform with live voice &amp; video rooms, instant messaging, community discovery,
+            and multiplayer in-app games — all from a single Flutter codebase for iOS &amp; Android. Implemented WebRTC
+            for peer-to-peer audio/video, LiveKit for room orchestration, WebSocket/JSON-RPC for real-time chat and
+            game state sync, and Riverpod for state management.
+          </div>
+          <div class="project-tags">
+            <span class="tag">Flutter</span>
+            <span class="tag">LiveKit / WebRTC</span>
+            <span class="tag">WebSocket</span>
+            <span class="tag">JSON-RPC 2.0</span>
+            <span class="tag">Riverpod</span>
+            <span class="tag">iOS &amp; Android</span>
+          </div>
+          <div class="project-arrow">View Project ——</div>
+        </div>
+
+        <!-- 2 -->
+        <div class="project-card reveal reveal-delay-1">
+          <div class="project-num">02</div>
+          <div class="project-name">Istanbul Real Estate App</div>
+          <div class="project-desc">
+            Solo-crafted a Flutter app with a C# backend for an Istanbul real estate firm, serving 1,000+ users
+            with real-time property tools. Cut load times by 25% through API and database optimisation.
+          </div>
+          <div class="project-tags">
+            <span class="tag">Flutter</span>
+            <span class="tag">C#</span>
+            <span class="tag">SQL Server</span>
+            <span class="tag">ASP.NET</span>
+          </div>
+          <div class="project-arrow">Jan – Jul 2024</div>
+        </div>
+
+        <!-- 3 -->
+        <div class="project-card reveal">
+          <div class="project-num">03</div>
+          <div class="project-name">Flex Money — Global Transfers</div>
+          <div class="project-desc">
+            Flutter app for global money transfers with a Figma-driven UI. Hit 3,000+ downloads in 6 months.
+            Slashed transaction times by 20% through efficient state management.
+          </div>
+          <div class="project-tags">
+            <span class="tag">Flutter</span>
+            <span class="tag">Dart</span>
+            <span class="tag">Figma</span>
+          </div>
+          <div class="project-arrow">Sep – Oct 2023</div>
+        </div>
+
+        <!-- 4 -->
+        <div class="project-card reveal reveal-delay-1">
+          <div class="project-num">04</div>
+          <div class="project-name">Fringe Interior Platform</div>
+          <div class="project-desc">
+            Flutter-based platform that compressed interior design workflows from 1 week down to 30 minutes
+            for 1,000 users. Boosted performance by 35%, raised engagement 20%, and introduced mobile ERP
+            capabilities via Flutter in an enterprise setting.
+          </div>
+          <div class="project-tags">
+            <span class="tag">Flutter</span>
+            <span class="tag">ASP.NET Web API</span>
+            <span class="tag">SQL Server</span>
+            <span class="tag">ERP</span>
+          </div>
+          <div class="project-arrow">2022 – 2024</div>
+        </div>
+
+        <!-- 5 -->
+        <div class="project-card reveal reveal-delay-2">
+          <div class="project-num">05</div>
+          <div class="project-name">Sports Reservation Platform</div>
+          <div class="project-desc">
+            Reservation system for 120 sports facilities, scaling to 150,000+ users with 2× revenue growth
+            over 3 years. Included admin dashboard for class scheduling, membership management, and automated
+            accounting via .NET Core / SQL Server.
+          </div>
+          <div class="project-tags">
+            <span class="tag">.NET Core</span>
+            <span class="tag">SQL Server</span>
+            <span class="tag">RESTful API</span>
+          </div>
+          <div class="project-arrow">2019 – 2022</div>
+        </div>
+
+        <!-- 6 -->
+        <div class="project-card reveal">
+          <div class="project-num">06</div>
+          <div class="project-name">Mobile Book Reader</div>
+          <div class="project-desc">
+            Pioneered a mobile book reader and retail app in Objective-C serving 30+ bookshops, growing
+            digital readership by 25%. Early evidence of mobile-first thinking before cross-platform
+            frameworks existed.
+          </div>
+          <div class="project-tags">
+            <span class="tag">Objective-C</span>
+            <span class="tag">iOS</span>
+            <span class="tag">Mobile-First</span>
+          </div>
+          <div class="project-arrow">Apr – Nov 2010</div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">03 — Experience</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="exp-list">
+
+        <div class="exp-item reveal">
+          <div class="exp-period">Mar 2026 — Present</div>
+          <div>
+            <div class="exp-role">Senior Software Engineer</div>
+            <div class="exp-company">DGN Tech Inc. · Part-time · Remote</div>
+            <ul class="exp-bullets">
+              <li>Built VIBE Social — a real-time social platform in Flutter with live voice &amp; video rooms, instant messaging, community discovery, and multiplayer in-app games.</li>
+              <li>Implemented WebRTC for peer-to-peer audio/video, LiveKit for room orchestration, and WebSocket/JSON-RPC for real-time chat and game state sync.</li>
+              <li>Delivered a fully cross-platform product (iOS &amp; Android) from a single Flutter codebase using Riverpod for state management.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-1">
+          <div class="exp-period">2022 — 2024</div>
+          <div>
+            <div class="exp-role">Senior Software Developer</div>
+            <div class="exp-company">Fringe Interior · Contract · Remote</div>
+            <ul class="exp-bullets">
+              <li>Developed a Flutter-based platform that compressed interior design workflows from 1 week to 30 minutes for 1,000 users.</li>
+              <li>Enhanced performance by 35% and drove a 20% rise in engagement through refined feature design.</li>
+              <li>Streamlined SQL Server ERP processes, cutting transaction time by 30% across 10,000+ records, and introduced mobile ERP capabilities.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-2">
+          <div class="exp-period">Jun 2019 — Jun 2022</div>
+          <div>
+            <div class="exp-role">Software Engineer</div>
+            <div class="exp-company">Payam Co. · Contract</div>
+            <ul class="exp-bullets">
+              <li>Launched a reservation platform for 120 sports facilities, scaling to 150,000+ users and delivering 2× revenue growth over 3 years.</li>
+              <li>Designed an admin dashboard for class scheduling, membership, and facility management, cutting administrative workload by 40%.</li>
+              <li>Engineered a scalable .NET Core / SQL Server backend with automated accounting that reduced financial processing time by 25%.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal">
+          <div class="exp-period">Jun 2018 — Jun 2021</div>
+          <div>
+            <div class="exp-role">Software Engineer</div>
+            <div class="exp-company">Green Dataware · Full-time · On-site</div>
+            <ul class="exp-bullets">
+              <li>Optimised SQL Server query performance for a high-traffic ERP system, boosting transaction speeds by 30% across 10,000+ records.</li>
+              <li>Refactored WPF desktop application core rendering, reducing load times by 25% for 3,000+ users.</li>
+              <li>Designed modular API architecture to support future Flutter mobile ERP integration across enterprise clients.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-1">
+          <div class="exp-period">Jun 2007 — Jun 2018</div>
+          <div>
+            <div class="exp-role">Software Developer</div>
+            <div class="exp-company">J Publication · Full-time · Tehran</div>
+            <ul class="exp-bullets">
+              <li>Built a mobile book reader and retail app serving 30+ bookshops, growing digital readership by 25% — early mobile-first thinking before cross-platform frameworks existed.</li>
+              <li>Developed a suite of business applications for sales tracking, production, and resource allocation — improving efficiency 30% and revenue by 20%.</li>
+              <li>Optimised SQL Server performance across 30+ locations, reducing data errors by 15% through query redesign and indexing.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-2">
+          <div class="exp-period">Jan 2006 — Dec 2007</div>
+          <div>
+            <div class="exp-role">Developer &amp; Data Analyst</div>
+            <div class="exp-company">Cancer Research Center · Hybrid</div>
+            <ul class="exp-bullets">
+              <li>Designed a data entry system for a 15-year cancer study, handling 30M+ records across 10,000 participants.</li>
+              <li>Enabled precise reporting for researchers — the project that sparked deep SQL Server expertise.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <div class="contact-eyebrow reveal">04 — Contact</div>
+        <h2 class="contact-heading reveal reveal-delay-1">
+          Let's build<br/><em>something great.</em>
+        </h2>
+        <p class="contact-desc reveal reveal-delay-2">
+          Open to freelance projects, consulting engagements, and remote-first full-time roles.
+          If you're building something ambitious and need someone who's done it before — let's talk.
+        </p>
+        <div class="contact-links reveal reveal-delay-3">
+          <a href="mailto:goudarz@example.com" class="contact-link">✉ Email</a>
+          <a href="https://www.linkedin.com/in/goudarz-javadi-zadeh/" target="_blank" class="contact-link">in LinkedIn</a>
+          <a href="https://github.com/" target="_blank" class="contact-link">⌥ GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 <span class="footer-gold">Goudarz Javadi Zadeh</span></span>
+    <span>Crafted with obsession — Istanbul, TR</span>
+  </footer>
+
+  <script>
+    // ── Cursor ──
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      ring.style.left   = rx + 'px'; ring.style.top  = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+
+    // ── Canvas particles ──
+    const canvas = document.getElementById('canvas-bg');
+    const ctx    = canvas.getContext('2d');
+    function resize() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+
+    const CHARS = ['0','1','{','}','(',')','=>','<','>','/','*','#','@','$'];
+    const particles = Array.from({length: 60}, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vy: Math.random() * 0.4 + 0.15,
+      vx: (Math.random() - 0.5) * 0.1,
+      char: CHARS[Math.floor(Math.random() * CHARS.length)],
+      alpha: Math.random() * 0.4 + 0.05,
+      size: Math.floor(Math.random() * 8 + 10),
+      timer: 0,
+      interval: Math.floor(Math.random() * 200 + 100),
+    }));
+
+    function drawParticles() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.font = '14px JetBrains Mono, monospace';
+      particles.forEach(p => {
+        p.y += p.vy; p.x += p.vx; p.timer++;
+        if (p.timer > p.interval) { p.char = CHARS[Math.floor(Math.random()*CHARS.length)]; p.timer = 0; }
+        if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
+        ctx.fillStyle = `rgba(232,168,56,${p.alpha})`;
+        ctx.font = `${p.size}px JetBrains Mono, monospace`;
+        ctx.fillText(p.char, p.x, p.y);
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    // ── Nav scroll ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Reveal on scroll ──
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // ── Marquee ──
+    const marqueeItems = [
+      'Flutter', 'WebRTC', 'LiveKit', 'Riverpod', 'C#', 'ASP.NET',
+      'WebSocket', 'JSON-RPC 2.0', '.NET Core', 'Dart', 'Python', 'FastAPI',
+      'SQL Server', 'Real-Time Systems', 'iOS & Android', 'Mobile-First', 'ERP Integration', 'Firebase'
+    ];
+    const track = document.getElementById('marqueeTrack');
+    const build = () => marqueeItems.map(t => `<span class="marquee-item"><span>◆</span> ${t} </span>`).join('');
+    track.innerHTML = build() + build(); // double for loop
+
+    // ── Skill bar animation ──
+    document.querySelectorAll('.skill-bar').forEach(bar => {
+      const w = bar.style.width; bar.style.width = '0';
+      setTimeout(() => bar.style.width = w, 500);
+    });
+  </script>
+</body>
+</html>
