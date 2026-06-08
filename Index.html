@@ -1,0 +1,1524 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Goudarz Javadi Zadeh — Flutter & Mobile Architect</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=JetBrains+Mono:wght@300;400;500&family=Spectral:ital,wght@0,300;0,400;1,300&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #0d0d0f;
+      --bg2:       #111115;
+      --bg3:       #18181e;
+      --border:    rgba(255,255,255,0.07);
+      --gold:      #e8a838;
+      --gold-dim:  rgba(232,168,56,0.15);
+      --gold-glow: rgba(232,168,56,0.35);
+      --text:      #e8e6e0;
+      --muted:     #6e6c68;
+      --muted2:    #9c9a94;
+      --white:     #ffffff;
+      --mono:      'JetBrains Mono', monospace;
+      --display:   'Syne', sans-serif;
+      --serif:     'Spectral', serif;
+    }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: var(--display);
+      overflow-x: hidden;
+      cursor: none;
+    }
+
+    /* ── Custom Cursor ── */
+    #cursor {
+      position: fixed; top: 0; left: 0; z-index: 9999;
+      pointer-events: none;
+      width: 12px; height: 12px;
+      background: var(--gold);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: width .15s, height .15s, background .15s;
+      mix-blend-mode: normal;
+    }
+    #cursor-ring {
+      position: fixed; top: 0; left: 0; z-index: 9998;
+      pointer-events: none;
+      width: 40px; height: 40px;
+      border: 1px solid rgba(232,168,56,0.5);
+      border-radius: 50%;
+      transform: translate(-50%,-50%);
+      transition: transform .08s ease, width .2s, height .2s, border-color .2s;
+    }
+    body:has(a:hover) #cursor, body:has(button:hover) #cursor { width: 6px; height: 6px; }
+    body:has(a:hover) #cursor-ring, body:has(button:hover) #cursor-ring {
+      width: 56px; height: 56px; border-color: var(--gold);
+    }
+
+    /* ── Canvas Background ── */
+    #canvas-bg {
+      position: fixed; inset: 0; z-index: 0;
+      pointer-events: none; opacity: .35;
+    }
+
+    /* ── Layout Helpers ── */
+    .container { max-width: 1200px; margin: 0 auto; padding: 0 40px; }
+    section { position: relative; z-index: 1; }
+
+    /* ── NAV ── */
+    nav {
+      position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+      display: flex; align-items: center; justify-content: space-between;
+      padding: 24px 48px;
+      border-bottom: 1px solid transparent;
+      transition: border-color .3s, background .3s, backdrop-filter .3s;
+    }
+    nav.scrolled {
+      border-color: var(--border);
+      background: rgba(13,13,15,0.85);
+      backdrop-filter: blur(16px);
+    }
+    .nav-logo {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--gold);
+      letter-spacing: .08em;
+      text-decoration: none;
+    }
+    .nav-links { display: flex; gap: 40px; list-style: none; }
+    .nav-links a {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted2);
+      text-decoration: none;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      transition: color .2s;
+    }
+    .nav-links a:hover { color: var(--gold); }
+
+    /* ── HERO ── */
+    #hero {
+      min-height: 100vh;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      align-items: center;
+      gap: 80px;
+      padding: 120px 48px 80px;
+    }
+    .hero-left { position: relative; }
+    .hero-eyebrow {
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--gold);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+      margin-bottom: 28px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .hero-eyebrow::before {
+      content: '';
+      display: block;
+      width: 40px; height: 1px;
+      background: var(--gold);
+    }
+    h1.hero-name {
+      font-size: clamp(36px, 4vw, 60px);
+      font-weight: 800;
+      line-height: .96;
+      letter-spacing: -.03em;
+      color: var(--white);
+      margin-bottom: 20px;
+    }
+    h1.hero-name span { color: var(--gold); }
+    .hero-slogan {
+      font-family: var(--mono);
+      font-size: clamp(13px, 1.3vw, 17px);
+      font-weight: 500;
+      color: var(--gold);
+      letter-spacing: .03em;
+      margin-bottom: 10px;
+      line-height: 1.5;
+    }
+    .hero-slogan-sub {
+      font-family: var(--serif);
+      font-style: italic;
+      font-weight: 300;
+      font-size: clamp(13px, 1.2vw, 16px);
+      color: var(--muted2);
+      margin-bottom: 36px;
+      line-height: 1.65;
+      max-width: 400px;
+    }
+    .hero-title { display: none; }
+    .hero-desc {
+      font-size: 15px;
+      line-height: 1.75;
+      color: var(--muted2);
+      max-width: 440px;
+      margin-bottom: 48px;
+    }
+    .hero-ctas { display: flex; gap: 16px; flex-wrap: wrap; }
+    .btn-primary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: var(--gold);
+      color: #0d0d0f;
+      font-family: var(--mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      text-decoration: none;
+      border: none; cursor: pointer;
+      transition: background .2s, transform .15s;
+      position: relative; overflow: hidden;
+    }
+    .btn-primary:hover { background: #f0b840; transform: translateY(-2px); }
+    .btn-secondary {
+      display: inline-flex; align-items: center; gap: 10px;
+      background: transparent;
+      color: var(--muted2);
+      font-family: var(--mono);
+      font-size: 12px;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      padding: 14px 28px;
+      text-decoration: none;
+      border: 1px solid var(--border);
+      cursor: pointer;
+      transition: border-color .2s, color .2s, transform .15s;
+    }
+    .btn-secondary:hover { border-color: var(--gold); color: var(--gold); transform: translateY(-2px); }
+
+    /* Hero Right — Stats + Visual */
+    .hero-right {
+      display: flex; flex-direction: column; gap: 24px;
+      position: relative;
+    }
+    .hero-stat-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 2px;
+    }
+    .stat-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 32px 28px;
+      position: relative;
+      overflow: hidden;
+      transition: border-color .3s;
+    }
+    .stat-card:hover { border-color: var(--gold-glow); }
+    .stat-card::after {
+      content: '';
+      position: absolute; bottom: 0; left: 0; right: 0; height: 2px;
+      background: var(--gold);
+      transform: scaleX(0); transform-origin: left;
+      transition: transform .4s ease;
+    }
+    .stat-card:hover::after { transform: scaleX(1); }
+    .stat-num {
+      font-size: 52px; font-weight: 800;
+      color: var(--white);
+      line-height: 1;
+      letter-spacing: -.04em;
+    }
+    .stat-num span { color: var(--gold); font-size: 32px; }
+    .stat-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+      margin-top: 8px;
+    }
+    .hero-availability {
+      display: flex; align-items: center; gap: 12px;
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      padding: 16px 24px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted2);
+      letter-spacing: .08em;
+    }
+    .avail-dot {
+      width: 8px; height: 8px; border-radius: 50%;
+      background: #4ade80;
+      box-shadow: 0 0 10px #4ade80;
+      animation: pulse-green 2s infinite;
+    }
+    @keyframes pulse-green {
+      0%,100% { box-shadow: 0 0 6px #4ade80; }
+      50% { box-shadow: 0 0 16px #4ade80, 0 0 30px rgba(74,222,128,.3); }
+    }
+
+    /* ── MARQUEE ── */
+    .marquee-wrap {
+      border-top: 1px solid var(--border);
+      border-bottom: 1px solid var(--border);
+      overflow: hidden;
+      padding: 20px 0;
+      background: var(--bg2);
+      position: relative; z-index: 1;
+    }
+    .marquee-track {
+      display: flex; gap: 0;
+      animation: marquee 30s linear infinite;
+      white-space: nowrap;
+    }
+    .marquee-item {
+      display: inline-flex; align-items: center; gap: 24px;
+      padding: 0 40px;
+      font-family: var(--mono);
+      font-size: 12px;
+      color: var(--muted);
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+    .marquee-item span { color: var(--gold); font-size: 16px; }
+    @keyframes marquee { from { transform: translateX(0); } to { transform: translateX(-50%); } }
+
+    /* ── SECTION HEADERS ── */
+    .section-header {
+      display: flex; align-items: center; gap: 20px;
+      margin-bottom: 64px;
+    }
+    .section-label {
+      font-family: var(--mono);
+      font-size: 11px;
+      color: var(--gold);
+      letter-spacing: .2em;
+      text-transform: uppercase;
+    }
+    .section-title {
+      font-size: clamp(36px, 4vw, 56px);
+      font-weight: 800;
+      color: var(--white);
+      letter-spacing: -.03em;
+      line-height: 1;
+    }
+    .section-rule {
+      flex: 1; height: 1px;
+      background: linear-gradient(to right, var(--border), transparent);
+    }
+
+    /* ── ABOUT ── */
+    #about { padding: 120px 48px; }
+    .about-grid {
+      display: grid; grid-template-columns: 1fr 1fr; gap: 80px;
+      align-items: start;
+    }
+    .about-text p {
+      font-size: 17px; line-height: 1.8;
+      color: var(--muted2);
+      margin-bottom: 24px;
+    }
+    .about-text p strong { color: var(--text); font-weight: 600; }
+    .about-text p em { color: var(--gold); font-style: normal; }
+    .skills-grid {
+      display: flex; flex-direction: column; gap: 6px;
+    }
+    .skill-row {
+      display: flex; align-items: center; gap: 16px;
+      padding: 14px 20px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      transition: border-color .25s, background .25s;
+      cursor: default;
+    }
+    .skill-row:hover { border-color: var(--gold-glow); background: var(--bg3); }
+    .skill-icon { font-size: 18px; width: 24px; text-align: center; }
+    .skill-name {
+      font-family: var(--mono);
+      font-size: 13px;
+      color: var(--text);
+      flex: 1;
+    }
+    .skill-bar-wrap {
+      width: 80px; height: 2px;
+      background: rgba(255,255,255,0.08);
+      position: relative;
+    }
+    .skill-bar {
+      position: absolute; left: 0; top: 0; bottom: 0;
+      background: var(--gold);
+      transition: width 1s ease;
+    }
+    .skill-pct {
+      font-family: var(--mono);
+      font-size: 10px;
+      color: var(--muted);
+      width: 32px;
+      text-align: right;
+    }
+
+    /* ── PROJECTS ── */
+    #projects { padding: 120px 48px; background: var(--bg2); }
+    .projects-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 16px;
+    }
+
+    .project-card {
+      background: var(--bg3);
+      border: 1px solid var(--border);
+      position: relative; overflow: hidden;
+      transition: border-color .35s, transform .35s, box-shadow .35s;
+      cursor: default;
+      display: flex; flex-direction: column;
+    }
+    .project-card:hover {
+      border-color: rgba(232,168,56,.5);
+      transform: translateY(-6px);
+      box-shadow: 0 24px 60px rgba(0,0,0,.5), 0 0 0 1px rgba(232,168,56,.15);
+    }
+
+    .project-visual {
+      position: relative;
+      width: 100%; aspect-ratio: 16/9;
+      overflow: hidden;
+      background: #0a0a0d;
+      flex-shrink: 0;
+    }
+    .project-visual canvas {
+      display: block; width: 100%; height: 100%;
+    }
+
+    .project-overlay {
+      position: absolute; inset: 0;
+      background: rgba(10,10,13,0.93);
+      backdrop-filter: blur(4px);
+      display: flex; flex-direction: column;
+      justify-content: center; align-items: flex-start;
+      padding: 24px 28px;
+      opacity: 0;
+      transition: opacity .3s ease;
+    }
+    .project-card:hover .project-overlay { opacity: 1; }
+    .overlay-desc {
+      font-size: 13px; line-height: 1.7;
+      color: var(--muted2); margin-bottom: 16px;
+    }
+    .overlay-tags { display: flex; flex-wrap: wrap; gap: 6px; }
+
+    .project-body {
+      padding: 20px 24px 24px;
+      display: flex; flex-direction: column; flex: 1;
+    }
+    .project-desc {
+      font-size: 14px; line-height: 1.7;
+      color: var(--muted2);
+      margin: 8px 0 14px;
+    }
+    .project-num {
+      font-family: var(--mono);
+      font-size: 10px; color: var(--gold);
+      letter-spacing: .18em; margin-bottom: 6px;
+      text-transform: uppercase;
+    }
+    .project-name {
+      font-size: 17px; font-weight: 700;
+      color: var(--white);
+      letter-spacing: -.02em; line-height: 1.2;
+    }
+    .project-meta {
+      font-family: var(--mono);
+      font-size: 11px; color: var(--muted);
+      margin-top: 8px; letter-spacing: .04em;
+    }
+
+    .tag {
+      font-family: var(--mono);
+      font-size: 10px; letter-spacing: .08em; text-transform: uppercase;
+      padding: 4px 10px;
+      background: var(--gold-dim);
+      color: var(--gold);
+      border: 1px solid rgba(232,168,56,.25);
+    }
+
+    .project-card.featured { grid-column: span 2; }
+    .project-card.featured .project-visual { aspect-ratio: 21/9; }
+    .project-card.featured .project-name { font-size: 20px; }
+
+    /* ── EXPERIENCE ── */
+    #experience { padding: 120px 48px; }
+    .exp-list { display: flex; flex-direction: column; gap: 2px; }
+    .exp-item {
+      display: grid; grid-template-columns: 200px 1fr;
+      gap: 40px;
+      padding: 36px 40px;
+      border: 1px solid var(--border);
+      background: var(--bg2);
+      transition: border-color .25s;
+    }
+    .exp-item:hover { border-color: rgba(232,168,56,.3); }
+    .exp-period {
+      font-family: var(--mono);
+      font-size: 12px; color: var(--muted);
+      letter-spacing: .08em;
+      padding-top: 4px;
+    }
+    .exp-role {
+      font-size: 20px; font-weight: 700;
+      color: var(--white); margin-bottom: 6px;
+      letter-spacing: -.02em;
+    }
+    .exp-company {
+      font-family: var(--mono);
+      font-size: 13px; color: var(--gold);
+      margin-bottom: 16px; letter-spacing: .05em;
+    }
+    .exp-bullets {
+      list-style: none;
+      display: flex; flex-direction: column; gap: 8px;
+    }
+    .exp-bullets li {
+      font-size: 14px; line-height: 1.65;
+      color: var(--muted2);
+      padding-left: 18px;
+      position: relative;
+    }
+    .exp-bullets li::before {
+      content: '›';
+      position: absolute; left: 0;
+      color: var(--gold);
+    }
+
+    /* ── CONTACT ── */
+    #contact {
+      padding: 120px 48px;
+      background: var(--bg2);
+      text-align: center;
+    }
+    .contact-inner { max-width: 640px; margin: 0 auto; }
+    .contact-eyebrow {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--gold); letter-spacing: .2em;
+      text-transform: uppercase; margin-bottom: 24px;
+    }
+    .contact-heading {
+      font-size: clamp(40px, 5vw, 72px);
+      font-weight: 800; letter-spacing: -.04em;
+      color: var(--white); line-height: .95;
+      margin-bottom: 24px;
+    }
+    .contact-heading em {
+      font-style: italic; font-family: var(--serif);
+      font-weight: 300; color: var(--gold);
+    }
+    .contact-desc {
+      font-size: 16px; line-height: 1.75;
+      color: var(--muted2); margin-bottom: 48px;
+    }
+    .contact-links {
+      display: flex; justify-content: center;
+      gap: 16px; flex-wrap: wrap;
+    }
+    .contact-link {
+      display: inline-flex; align-items: center; gap: 8px;
+      font-family: var(--mono); font-size: 12px;
+      color: var(--muted2); text-decoration: none;
+      letter-spacing: .1em; text-transform: uppercase;
+      padding: 12px 24px;
+      border: 1px solid var(--border);
+      transition: border-color .2s, color .2s;
+    }
+    .contact-link:hover { border-color: var(--gold); color: var(--gold); }
+
+    /* ── FOOTER ── */
+    footer {
+      padding: 32px 48px;
+      border-top: 1px solid var(--border);
+      display: flex; justify-content: space-between; align-items: center;
+      position: relative; z-index: 1;
+    }
+    footer span {
+      font-family: var(--mono); font-size: 11px;
+      color: var(--muted); letter-spacing: .08em;
+    }
+    footer .footer-gold { color: var(--gold); }
+
+    /* ── ANIMATIONS ── */
+    .reveal {
+      opacity: 0; transform: translateY(32px);
+      transition: opacity .7s ease, transform .7s ease;
+    }
+    .reveal.visible { opacity: 1; transform: none; }
+    .reveal-delay-1 { transition-delay: .1s; }
+    .reveal-delay-2 { transition-delay: .2s; }
+    .reveal-delay-3 { transition-delay: .3s; }
+    .reveal-delay-4 { transition-delay: .4s; }
+
+    /* ── RESPONSIVE ── */
+    @media (max-width: 900px) {
+      nav { padding: 20px 24px; }
+      .nav-links { display: none; }
+      #hero { grid-template-columns: 1fr; padding: 100px 24px 60px; gap: 60px; }
+      .hero-stat-grid { grid-template-columns: 1fr 1fr; }
+      #about, #projects, #experience, #contact { padding: 80px 24px; }
+      .about-grid { grid-template-columns: 1fr; gap: 48px; }
+      .projects-grid { grid-template-columns: 1fr; gap: 12px; }
+      .project-card.featured { grid-column: span 1; }
+      .project-card.featured .project-visual { aspect-ratio: 16/9; }
+      .exp-item { grid-template-columns: 1fr; gap: 12px; }
+      footer { padding: 24px; flex-direction: column; gap: 12px; text-align: center; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Custom cursor -->
+  <div id="cursor"></div>
+  <div id="cursor-ring"></div>
+
+  <!-- Particle canvas -->
+  <canvas id="canvas-bg"></canvas>
+
+  <!-- NAV -->
+  <nav id="nav">
+    <a href="#" class="nav-logo">GJZ<span style="color:var(--muted)">_</span>DEV</a>
+    <ul class="nav-links">
+      <li><a href="#about">About</a></li>
+      <li><a href="#projects">Projects</a></li>
+      <li><a href="#experience">Experience</a></li>
+      <li><a href="#contact">Contact</a></li>
+    </ul>
+  </nav>
+
+  <!-- HERO -->
+  <section id="hero">
+    <div class="hero-left">
+      <div class="hero-eyebrow reveal">Senior Software Developer</div>
+      <h1 class="hero-name reveal reveal-delay-1">
+        Goudarz<br/><span>Javadi</span><br/>Zadeh
+      </h1>
+      <p class="hero-slogan reveal reveal-delay-2">Flutter architect. Real-time systems. Clean code, always.</p>
+      <p class="hero-slogan-sub reveal reveal-delay-3">I turn complex ideas into cross-platform products that scale — from concept to production.</p>
+      <p class="hero-desc reveal reveal-delay-3">
+        25+ years crafting digital products across mobile, backend, and real-time systems.
+        Specialising in Flutter/Dart, live voice &amp; video platforms, and full-stack integrations
+        that work at scale.
+      </p>
+      <div class="hero-ctas reveal reveal-delay-4">
+        <a href="#projects" class="btn-primary">View Projects →</a>
+        <a href="#contact" class="btn-secondary">Let's Talk</a>
+      </div>
+    </div>
+
+    <div class="hero-right reveal reveal-delay-2">
+      <div class="hero-stat-grid">
+        <div class="stat-card">
+          <div class="stat-num">25<span>+</span></div>
+          <div class="stat-label">Years Experience</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">150<span>k+</span></div>
+          <div class="stat-label">Users Served</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">6</div>
+          <div class="stat-label">Companies</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-num">30<span>M+</span></div>
+          <div class="stat-label">Records Processed</div>
+        </div>
+      </div>
+      <div class="hero-availability">
+        <div class="avail-dot"></div>
+        Available for freelance &amp; consulting engagements
+      </div>
+    </div>
+  </section>
+
+  <!-- MARQUEE -->
+  <div class="marquee-wrap">
+    <div class="marquee-track" id="marqueeTrack">
+      <!-- duplicated for infinite scroll -->
+    </div>
+  </div>
+
+  <!-- ABOUT -->
+  <section id="about">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">01 — About</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="about-grid">
+        <div class="about-text">
+          <p class="reveal">
+            I'm a <strong>senior software developer with 25+ years of experience</strong>, based in Istanbul.
+            My career spans real-time social platforms, enterprise ERP systems, fintech apps, and large-scale data
+            solutions — built with precision, performance, and clean architecture at the forefront.
+          </p>
+          <p class="reveal reveal-delay-1">
+            Today I focus on <em>Flutter &amp; real-time systems</em> — building cross-platform mobile products
+            that feel native, backed by rock-solid backends. From 150,000-user reservation platforms to live
+            WebRTC social apps, I own the full stack when needed.
+          </p>
+          <p class="reveal reveal-delay-2">
+            I started mobile before cross-platform frameworks even existed — writing Objective-C readers for
+            bookshops in 2010. That foundation means I understand the platform deeply, not just the framework.
+            <strong>I don't just write code. I architect systems that last.</strong>
+          </p>
+        </div>
+        <div class="skills-grid reveal reveal-delay-1">
+          <div class="skill-row"><span class="skill-icon">📱</span><span class="skill-name">Flutter / Dart</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:97%"></div></div><span class="skill-pct">97%</span></div>
+          <div class="skill-row"><span class="skill-icon">⚡</span><span class="skill-name">WebSocket / WebRTC</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:90%"></div></div><span class="skill-pct">90%</span></div>
+          <div class="skill-row"><span class="skill-icon">🔴</span><span class="skill-name">Riverpod / State Mgmt</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:93%"></div></div><span class="skill-pct">93%</span></div>
+          <div class="skill-row"><span class="skill-icon">🎥</span><span class="skill-name">LiveKit / Real-Time AV</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:85%"></div></div><span class="skill-pct">85%</span></div>
+          <div class="skill-row"><span class="skill-icon">🗄️</span><span class="skill-name">SQL Server / .NET Core</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:92%"></div></div><span class="skill-pct">92%</span></div>
+          <div class="skill-row"><span class="skill-icon">⚙️</span><span class="skill-name">C# / ASP.NET Web API</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:88%"></div></div><span class="skill-pct">88%</span></div>
+          <div class="skill-row"><span class="skill-icon">🐍</span><span class="skill-name">Python / FastAPI</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:70%"></div></div><span class="skill-pct">70%</span></div>
+          <div class="skill-row"><span class="skill-icon">🌐</span><span class="skill-name">Next.js / React</span><div class="skill-bar-wrap"><div class="skill-bar" style="width:75%"></div></div><span class="skill-pct">75%</span></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJECTS -->
+  <section id="projects">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">02 — Projects</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="projects-grid">
+
+        <!-- 01 VIBE — Featured -->
+        <div class="project-card featured reveal">
+          <div class="project-visual">
+            <img src="Images/vibe.jpg" style="width:100%;height:100%;object-fit:cover">
+            <div class="project-overlay">
+              <p class="overlay-desc">VIBE Social — Built real-time social platform in Flutter featuring live voice & video rooms, 
+                instant messaging, community discovery, and multiplayer in-app games. Implemented WebRTC 
+                for peer-to-peer audio/video streaming, LiveKit for room orchestration, WebSocket/JSON-RPC 
+                for real-time chat and game state synchronization, and Riverpod for state management — all 
+                cross-platform from a single Flutter codebase across iOS and Android.</p>              
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">01 — Flagship</div>
+            <div class="project-name">VIBE — Real-Time Social Platform</div>
+            <div class="project-meta">DGN Tech Inc. · 2026 · iOS &amp; Android</div>
+            <p class="project-desc">Live voice &amp; video rooms, instant messaging, community discovery, and multiplayer games — all from a single Flutter codebase for iOS &amp; Android.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">Flutter</span><span class="tag">LiveKit</span><span class="tag">WebRTC</span><span class="tag">WebSocket</span><span class="tag">JSON-RPC 2.0</span><span class="tag">Riverpod</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 02 Real Estate -->
+        <div class="project-card reveal reveal-delay-1">
+          <div class="project-visual">
+            <img src="Images/Sunev.jpg" style="width:100%;height:100%;object-fit:cover">
+            <div class="project-overlay">
+              <p class="overlay-desc">Solo-crafted Flutter app with C# backend for an Istanbul real estate firm — 1,000+ users, 25% faster load times.</p>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">02</div>
+            <div class="project-name">Istanbul Real Estate App</div>
+            <div class="project-meta">Jan – Jul 2024 · 1,000+ users</div>
+            <p class="project-desc">Solo-crafted Flutter app with C# backend for an Istanbul real estate firm — 1,000+ users, 25% faster load times.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">Flutter</span><span class="tag">C#</span><span class="tag">SQL Server</span><span class="tag">ASP.NET</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 03 Flex Money -->
+        <div class="project-card reveal">
+          <div class="project-visual">
+            <img src="Images/FlexMoney.jpg" style="width:100%;height:100%;object-fit:cover">
+            <div class="project-overlay">
+              <p class="overlay-desc">Global money transfer app with Figma-driven UI. 3,000+ downloads in 6 months, 20% faster transactions.</p>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">03</div>
+            <div class="project-name">Flex Money</div>
+            <div class="project-meta">Sep – Oct 2023 · 3,000+ downloads</div>
+            <p class="project-desc">Global money transfer app with Figma-driven UI. 3,000+ downloads in 6 months, 20% faster transaction times.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Figma</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 Fringe Interior -->
+        <div class="project-card reveal reveal-delay-1">
+          <div class="project-visual">
+            <img src="Images/FringeWeb.jpg" style="width:100%;height:100%;object-fit:cover">
+            <div class="project-overlay">
+              <p class="overlay-desc">Interior design platform that reduced workflows from 1 week to 30 minutes for 1,000 users. +35% performance, +20% engagement.</p>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">04</div>
+            <div class="project-name">Fringe Interior Platform</div>
+            <div class="project-meta">2022 – 2024 · 1,000 users</div>
+            <p class="project-desc">Compressed interior design workflows from 1 week to 30 minutes. +35% performance, +20% engagement, mobile ERP via Flutter.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">Flutter</span><span class="tag">ASP.NET Web API</span><span class="tag">SQL Server</span><span class="tag">ERP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 04 Fringe Interior Mobile -->
+        <div class="project-card reveal reveal-delay-1">
+          <div class="project-visual">
+            <img src="Images/FringeMobile.jpg" style="width:100%;height:100%;object-fit:cover">
+            <div class="project-overlay">
+              <p class="overlay-desc">Interior design platform that reduced workflows from 1 week to 30 minutes for 1,000 users. +35% performance, +20% engagement.</p>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">04</div>
+            <div class="project-name">Fringe Interior Mobile App</div>
+            <div class="project-meta">2022 – 2024</div>
+            <p class="project-desc">Compressed interior design workflows from 1 week to 30 minutes. +35% performance, +20% engagement, mobile ERP via Flutter.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">Flutter</span><span class="tag">ASP.NET Web API</span><span class="tag">SQL Server</span><span class="tag">ERP</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 05 Sports -->
+        <div class="project-card reveal reveal-delay-2">
+          <div class="project-visual">
+            <canvas id="mock-sports"></canvas>
+            <div class="project-overlay">
+              <p class="overlay-desc">Reservation platform for 120 sports facilities. Scaled to 150,000+ users, 2× revenue growth in 3 years, admin workload cut 40%.</p>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">05</div>
+            <div class="project-name">Sports Reservation Platform</div>
+            <div class="project-meta">2019 – 2022 · 150,000+ users</div>
+            <p class="project-desc">Reservation system for 120 sports facilities. Scaled to 150,000+ users, 2× revenue growth, admin workload cut 40%.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">.NET Core</span><span class="tag">SQL Server</span><span class="tag">RESTful API</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 06 Book Reader -->
+        <div class="project-card reveal">
+          <div class="project-visual">
+            <canvas id="mock-bookreader"></canvas>
+            <div class="project-overlay">
+              <p class="overlay-desc">Mobile book reader &amp; retail app in Objective-C for 30+ bookshops. Grew digital readership by 25% — before cross-platform frameworks existed.</p>
+            </div>
+          </div>
+          <div class="project-body">
+            <div class="project-num">06</div>
+            <div class="project-name">Mobile Book Reader</div>
+            <div class="project-meta">Apr – Nov 2010 · 30+ bookshops</div>
+            <p class="project-desc">Mobile book reader &amp; retail app in Objective-C for 30+ bookshops. Grew digital readership 25% — before cross-platform existed.</p>
+            <div class="overlay-tags" style="margin-top:auto">
+              <span class="tag">Objective-C</span><span class="tag">iOS</span><span class="tag">Mobile-First</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- EXPERIENCE -->
+  <section id="experience">
+    <div class="container">
+      <div class="section-header reveal">
+        <span class="section-label">03 — Experience</span>
+        <div class="section-rule"></div>
+      </div>
+      <div class="exp-list">
+
+        <div class="exp-item reveal">
+          <div class="exp-period">Mar 2026 — Present</div>
+          <div>
+            <div class="exp-role">Senior Software Engineer</div>
+            <div class="exp-company">DGN Tech Inc. · Part-time · Remote</div>
+            <ul class="exp-bullets">
+              <li>Built VIBE Social — a real-time social platform in Flutter with live voice &amp; video rooms, instant messaging, community discovery, and multiplayer in-app games.</li>
+              <li>Implemented WebRTC for peer-to-peer audio/video, LiveKit for room orchestration, and WebSocket/JSON-RPC for real-time chat and game state sync.</li>
+              <li>Delivered a fully cross-platform product (iOS &amp; Android) from a single Flutter codebase using Riverpod for state management.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-1">
+          <div class="exp-period">2022 — 2024</div>
+          <div>
+            <div class="exp-role">Senior Software Developer</div>
+            <div class="exp-company">Fringe Interior · Contract · Remote</div>
+            <ul class="exp-bullets">
+              <li>Developed a Flutter-based platform that compressed interior design workflows from 1 week to 30 minutes for 1,000 users.</li>
+              <li>Enhanced performance by 35% and drove a 20% rise in engagement through refined feature design.</li>
+              <li>Streamlined SQL Server ERP processes, cutting transaction time by 30% across 10,000+ records, and introduced mobile ERP capabilities.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-2">
+          <div class="exp-period">Jun 2019 — Jun 2022</div>
+          <div>
+            <div class="exp-role">Software Engineer</div>
+            <div class="exp-company">Payam Co. · Contract</div>
+            <ul class="exp-bullets">
+              <li>Launched a reservation platform for 120 sports facilities, scaling to 150,000+ users and delivering 2× revenue growth over 3 years.</li>
+              <li>Designed an admin dashboard for class scheduling, membership, and facility management, cutting administrative workload by 40%.</li>
+              <li>Engineered a scalable .NET Core / SQL Server backend with automated accounting that reduced financial processing time by 25%.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal">
+          <div class="exp-period">Jun 2018 — Jun 2021</div>
+          <div>
+            <div class="exp-role">Software Engineer</div>
+            <div class="exp-company">Green Dataware · Full-time · On-site</div>
+            <ul class="exp-bullets">
+              <li>Optimised SQL Server query performance for a high-traffic ERP system, boosting transaction speeds by 30% across 10,000+ records.</li>
+              <li>Refactored WPF desktop application core rendering, reducing load times by 25% for 3,000+ users.</li>
+              <li>Designed modular API architecture to support future Flutter mobile ERP integration across enterprise clients.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-1">
+          <div class="exp-period">Jun 2007 — Jun 2018</div>
+          <div>
+            <div class="exp-role">Software Developer</div>
+            <div class="exp-company">J Publication · Full-time · Tehran</div>
+            <ul class="exp-bullets">
+              <li>Built a mobile book reader and retail app serving 30+ bookshops, growing digital readership by 25% — early mobile-first thinking before cross-platform frameworks existed.</li>
+              <li>Developed a suite of business applications for sales tracking, production, and resource allocation — improving efficiency 30% and revenue by 20%.</li>
+              <li>Optimised SQL Server performance across 30+ locations, reducing data errors by 15% through query redesign and indexing.</li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="exp-item reveal reveal-delay-2">
+          <div class="exp-period">Jan 2006 — Dec 2007</div>
+          <div>
+            <div class="exp-role">Developer &amp; Data Analyst</div>
+            <div class="exp-company">Cancer Research Center · Hybrid</div>
+            <ul class="exp-bullets">
+              <li>Designed a data entry system for a 15-year cancer study, handling 30M+ records across 10,000 participants.</li>
+              <li>Enabled precise reporting for researchers — the project that sparked deep SQL Server expertise.</li>
+            </ul>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </section>
+
+  <!-- CONTACT -->
+  <section id="contact">
+    <div class="container">
+      <div class="contact-inner">
+        <div class="contact-eyebrow reveal">04 — Contact</div>
+        <h2 class="contact-heading reveal reveal-delay-1">
+          Let's build<br/><em>something great.</em>
+        </h2>
+        <p class="contact-desc reveal reveal-delay-2">
+          Open to freelance projects, consulting engagements, and remote-first full-time roles.
+          If you're building something ambitious and need someone who's done it before — let's talk.
+        </p>
+        <div class="contact-links reveal reveal-delay-3">
+          <a href="mailto:goudarz@example.com" class="contact-link">✉ Email</a>
+          <a href="https://www.linkedin.com/in/goudarz-javadi-zadeh/" target="_blank" class="contact-link">in LinkedIn</a>
+          <a href="https://github.com/" target="_blank" class="contact-link">⌥ GitHub</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FOOTER -->
+  <footer>
+    <span>© 2026 <span class="footer-gold">Goudarz Javadi Zadeh</span></span>
+    <span>Crafted with obsession — Istanbul, TR</span>
+  </footer>
+
+  <script>
+  // ═══════════════════════════════════════════════
+  // PROJECT MOCKUP RENDERERS
+  // Each draws a unique thematic placeholder visual
+  // To swap with a real screenshot, replace the canvas
+  // with: <img src="your-screenshot.png" style="width:100%;height:100%;object-fit:cover">
+  // ═══════════════════════════════════════════════
+
+  const GOLD = '#e8a838';
+  const GOLD_DIM = 'rgba(232,168,56,0.18)';
+  const GOLD_GLOW = 'rgba(232,168,56,0.08)';
+  const BG3 = '#18181e';
+  const MUTED = '#3a3a42';
+  const MUTED2 = '#4a4a54';
+  const WHITE = 'rgba(255,255,255,0.85)';
+  const WHITE_DIM = 'rgba(255,255,255,0.12)';
+
+  // Utility: draw a rounded rect
+  function rr(ctx, x, y, w, h, r) {
+    ctx.beginPath();
+    ctx.moveTo(x+r, y);
+    ctx.lineTo(x+w-r, y); ctx.arcTo(x+w,y,x+w,y+r,r);
+    ctx.lineTo(x+w, y+h-r); ctx.arcTo(x+w,y+h,x+w-r,y+h,r);
+    ctx.lineTo(x+r, y+h); ctx.arcTo(x,y+h,x,y+h-r,r);
+    ctx.lineTo(x, y+r); ctx.arcTo(x,y,x+r,y,r);
+    ctx.closePath();
+  }
+
+  // Utility: draw phone frame
+  function drawPhone(ctx, x, y, w, h) {
+    ctx.strokeStyle = MUTED2; ctx.lineWidth = 1.5;
+    rr(ctx, x, y, w, h, 8); ctx.stroke();
+    // notch
+    rr(ctx, x + w/2 - 12, y + 4, 24, 5, 3);
+    ctx.fillStyle = MUTED; ctx.fill();
+    // home bar
+    rr(ctx, x + w/2 - 16, y + h - 8, 32, 3, 2);
+    ctx.fillStyle = MUTED; ctx.fill();
+  }
+
+  // Utility: small avatar circle
+  function avatar(ctx, x, y, r, color) {
+    ctx.beginPath(); ctx.arc(x, y, r, 0, Math.PI*2);
+    ctx.fillStyle = color || MUTED2; ctx.fill();
+  }
+
+  // ── 1. VIBE: social rooms UI ──
+  function drawVibe() {
+    const el = document.getElementById('mock-vibe');
+    if (!el) return;
+    const W = el.offsetWidth || 600, H = el.offsetHeight || 260;
+    el.width = W * devicePixelRatio; el.height = H * devicePixelRatio;
+    const ctx = el.getContext('2d');
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    // bg gradient
+    const bg = ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0, '#0d0d14'); bg.addColorStop(1, '#12101a');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+    // Grid lines
+    ctx.strokeStyle = 'rgba(255,255,255,0.03)'; ctx.lineWidth = 1;
+    for (let i=0; i<W; i+=40) { ctx.beginPath(); ctx.moveTo(i,0); ctx.lineTo(i,H); ctx.stroke(); }
+    for (let i=0; i<H; i+=40) { ctx.beginPath(); ctx.moveTo(0,i); ctx.lineTo(W,i); ctx.stroke(); }
+
+    const S = W / 560;
+
+    // Left sidebar
+    ctx.fillStyle = 'rgba(255,255,255,0.04)';
+    ctx.fillRect(0, 0, 52*S, H);
+    // sidebar icons
+    const icons = [20, 60, 100, 140];
+    icons.forEach((y, i) => {
+      rr(ctx, 14*S, y*S - 10*S, 24*S, 24*S, 5);
+      ctx.fillStyle = i === 0 ? GOLD_DIM : 'rgba(255,255,255,0.07)';
+      ctx.fill();
+      // icon dot
+      ctx.fillStyle = i === 0 ? GOLD : MUTED;
+      ctx.fillRect(22*S, y*S - 2*S, 8*S, 2*S);
+      ctx.fillRect(22*S, y*S + 3*S, 8*S, 2*S);
+    });
+
+    // Main content area — 2 live rooms
+    const roomW = 180*S, roomH = 110*S, roomX = 68*S;
+
+    // Room 1 — LIVE
+    rr(ctx, roomX, 16*S, roomW, roomH, 8);
+    ctx.fillStyle = 'rgba(232,168,56,0.08)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(232,168,56,0.35)'; ctx.lineWidth = 1; ctx.stroke();
+    // LIVE badge
+    rr(ctx, roomX + 8*S, 24*S, 32*S, 12*S, 3);
+    ctx.fillStyle = 'rgba(255,60,60,0.85)'; ctx.fill();
+    ctx.fillStyle = '#fff'; ctx.font = `bold ${8*S}px sans-serif`;
+    ctx.fillText('LIVE', roomX + 12*S, 33*S);
+    // avatars in room
+    const avColors = ['#e8a838','#60a5fa','#a78bfa','#34d399'];
+    for (let i=0; i<4; i++) avatar(ctx, roomX + (22 + i*22)*S, 80*S, 12*S, avColors[i]);
+    // sound waves
+    for (let i=0; i<5; i++) {
+      const bh = (6 + Math.sin(i*1.3)*4)*S;
+      ctx.fillStyle = i===2 ? GOLD : 'rgba(232,168,56,0.4)';
+      ctx.fillRect(roomX + (20+i*8)*S, 100*S - bh/2, 4*S, bh);
+    }
+    ctx.fillStyle = WHITE; ctx.font = `bold ${9*S}px sans-serif`;
+    ctx.fillText('Chill Lounge #12', roomX + 8*S, 60*S);
+
+    // Room 2
+    rr(ctx, roomX + roomW + 16*S, 16*S, roomW, roomH, 8);
+    ctx.fillStyle = 'rgba(96,165,250,0.07)'; ctx.fill();
+    ctx.strokeStyle = 'rgba(96,165,250,0.25)'; ctx.lineWidth = 1; ctx.stroke();
+    const r2x = roomX + roomW + 16*S;
+    for (let i=0; i<3; i++) avatar(ctx, r2x + (22 + i*22)*S, 80*S, 12*S, avColors[i]);
+    ctx.fillStyle = WHITE; ctx.font = `bold ${9*S}px sans-serif`;
+    ctx.fillText('Game Night 🎮', r2x + 8*S, 60*S);
+
+    // Chat panel on right
+    const chatX = roomX + (roomW + 16*S)*2 + 8*S;
+    const chatW = W - chatX - 16*S;
+    rr(ctx, chatX, 16*S, chatW, H - 32*S, 8);
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fill();
+    ctx.strokeStyle = MUTED; ctx.lineWidth = 1; ctx.stroke();
+
+    // chat header
+    ctx.fillStyle = WHITE; ctx.font = `bold ${8*S}px sans-serif`;
+    ctx.fillText('Messages', chatX + 10*S, 32*S);
+
+    // chat messages
+    const msgs = [
+      {c:'#e8a838', w: 0.6}, {c:'#60a5fa', w: 0.45},
+      {c:'#a78bfa', w: 0.7}, {c:'#34d399', w: 0.35},
+    ];
+    msgs.forEach((m, i) => {
+      avatar(ctx, chatX + 14*S, 52*S + i*26*S, 7*S, m.c);
+      rr(ctx, chatX + 26*S, 46*S + i*26*S, chatW * m.w - 30*S, 12*S, 3);
+      ctx.fillStyle = 'rgba(255,255,255,0.07)'; ctx.fill();
+    });
+
+    // Bottom: UNO game preview strip
+    rr(ctx, roomX, H - 80*S, W - roomX - 16*S, 64*S, 8);
+    ctx.fillStyle = 'rgba(255,255,255,0.03)'; ctx.fill();
+    ctx.strokeStyle = MUTED; ctx.lineWidth = 1; ctx.stroke();
+    ctx.fillStyle = GOLD; ctx.font = `bold ${8*S}px sans-serif`;
+    ctx.fillText('UNO · In Progress', roomX + 10*S, H - 66*S);
+    // card shapes
+    const cardColors = ['#ef4444','#3b82f6','#22c55e','#e8a838'];
+    cardColors.forEach((c,i) => {
+      rr(ctx, roomX + (12 + i*22)*S, H - 58*S, 16*S, 26*S, 3);
+      ctx.fillStyle = c; ctx.fill();
+    });
+    // hand cards (fanned)
+    for (let i=0; i<6; i++) {
+      ctx.save();
+      ctx.translate(roomX + 160*S + i*14*S, H - 40*S);
+      ctx.rotate((-12 + i*5) * Math.PI/180);
+      rr(ctx, -8, -20, 16, 26, 3);
+      ctx.fillStyle = i===2 ? GOLD : 'rgba(255,255,255,0.12)'; ctx.fill();
+      ctx.strokeStyle = 'rgba(255,255,255,0.2)'; ctx.lineWidth = 0.5; ctx.stroke();
+      ctx.restore();
+    }
+  }
+
+  // ── 2. Real Estate: map + listings ──
+  function drawRealEstate() {
+    const el = document.getElementById('mock-realestate');
+    if (!el) return;
+    const W = el.offsetWidth || 300, H = el.offsetHeight || 169;
+    el.width = W*devicePixelRatio; el.height = H*devicePixelRatio;
+    const ctx = el.getContext('2d');
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    const bg = ctx.createLinearGradient(0,0,0,H);
+    bg.addColorStop(0,'#0e0f14'); bg.addColorStop(1,'#111318');
+    ctx.fillStyle = bg; ctx.fillRect(0,0,W,H);
+
+    const S = W/300;
+    // Map area (left half)
+    const mapW = W*0.55;
+    ctx.fillStyle = '#141820'; ctx.fillRect(0,0,mapW,H);
+
+    // Map grid streets
+    ctx.strokeStyle = 'rgba(255,255,255,0.05)'; ctx.lineWidth = 1;
+    for (let x=0; x<mapW; x+=20*S) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+    for (let y=0; y<H; y+=20*S) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(mapW,y); ctx.stroke(); }
+
+    // Roads
+    ctx.strokeStyle = 'rgba(255,255,255,0.12)'; ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.moveTo(0, H*0.4); ctx.lineTo(mapW, H*0.4); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(mapW*0.35, 0); ctx.lineTo(mapW*0.35, H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(mapW*0.7, 0); ctx.lineTo(mapW*0.7, H); ctx.stroke();
+
+    // Map pins
+    const pins = [{x:0.2,y:0.3},{x:0.5,y:0.55},{x:0.7,y:0.25},{x:0.45,y:0.7}];
+    pins.forEach((p, i) => {
+      const px = p.x*mapW, py = p.y*H;
+      // pin glow
+      const g = ctx.createRadialGradient(px,py,0,px,py,14*S);
+      g.addColorStop(0,'rgba(232,168,56,0.2)'); g.addColorStop(1,'transparent');
+      ctx.fillStyle = g; ctx.beginPath(); ctx.arc(px,py,14*S,0,Math.PI*2); ctx.fill();
+      // pin
+      ctx.fillStyle = i===1 ? GOLD : MUTED2;
+      ctx.beginPath(); ctx.arc(px,py,5*S,0,Math.PI*2); ctx.fill();
+      if (i===1) {
+        ctx.fillStyle = '#0d0d0f';
+        ctx.beginPath(); ctx.arc(px,py,2*S,0,Math.PI*2); ctx.fill();
+      }
+    });
+
+    // Right panel: listing cards
+    const lx = mapW + 8*S;
+    const lw = W - lx - 8*S;
+    [[H*0.06,'3-Bed Apt','$285k'],[H*0.37,'Studio Flat','$142k'],[H*0.64,'Villa','$890k']].forEach(([ly,name,price]) => {
+      rr(ctx, lx, ly, lw, H*0.27, 5);
+      ctx.fillStyle = 'rgba(255,255,255,0.04)'; ctx.fill();
+      ctx.strokeStyle = MUTED; ctx.lineWidth = 0.5; ctx.stroke();
+      // thumb
+      rr(ctx, lx+4*S, ly+4*S, 28*S, 28*S, 3);
+      ctx.fillStyle = MUTED2; ctx.fill();
+      // text lines
+      ctx.fillStyle = WHITE; ctx.font = `bold ${7*S}px sans-serif`;
+      ctx.fillText(name, lx+36*S, ly+14*S);
+      ctx.fillStyle = GOLD; ctx.font = `bold ${8*S}px sans-serif`;
+      ctx.fillText(price, lx+36*S, ly+26*S);
+    });
+  }
+
+  // ── 3. Flex Money: fintech app ──
+  function drawFlexMoney() {
+    const el = document.getElementById('mock-flexmoney');
+    if (!el) return;
+    const W = el.offsetWidth||300, H = el.offsetHeight||169;
+    el.width=W*devicePixelRatio; el.height=H*devicePixelRatio;
+    const ctx=el.getContext('2d');
+    ctx.scale(devicePixelRatio, devicePixelRatio);
+
+    const bg = ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#0a0e1a'); bg.addColorStop(1,'#0d1520');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+    const S=W/300;
+
+    // phone frame
+    const ph={x:W/2-38*S, y:8*S, w:76*S, h:H-16*S};
+    rr(ctx,ph.x,ph.y,ph.w,ph.h,10);
+    ctx.fillStyle='#0f1520'; ctx.fill();
+    ctx.strokeStyle='rgba(59,130,246,0.4)'; ctx.lineWidth=1; ctx.stroke();
+
+    // screen area
+    const sx=ph.x+3*S, sy=ph.y+10*S, sw=ph.w-6*S, sh=ph.h-20*S;
+    rr(ctx,sx,sy,sw,sh,6); ctx.fillStyle='#0d1218'; ctx.fill();
+
+    // balance card
+    const bg2=ctx.createLinearGradient(sx,sy,sx+sw,sy+sh*0.4);
+    bg2.addColorStop(0,'#1e3a5f'); bg2.addColorStop(1,'#0f2040');
+    rr(ctx,sx+4*S,sy+4*S,sw-8*S,sh*0.38,5);
+    ctx.fillStyle=bg2; ctx.fill();
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`${5*S}px sans-serif`;
+    ctx.fillText('Total Balance', sx+9*S, sy+14*S);
+    ctx.fillStyle='#fff'; ctx.font=`bold ${12*S}px sans-serif`;
+    ctx.fillText('$12,840.50', sx+9*S, sy+26*S);
+
+    // send/receive btns
+    const btnY = sy+sh*0.42;
+    ['Send','Receive'].forEach((t,i) => {
+      rr(ctx, sx+4*S+i*(sw/2-6*S), btnY, sw/2-10*S, 14*S, 4);
+      ctx.fillStyle = i===0 ? 'rgba(59,130,246,0.8)' : 'rgba(255,255,255,0.06)'; ctx.fill();
+      ctx.fillStyle='#fff'; ctx.font=`bold ${6*S}px sans-serif`;
+      ctx.fillText(t, sx+12*S+i*(sw/2-6*S), btnY+9*S);
+    });
+
+    // transaction list
+    const txY = sy+sh*0.58;
+    [['→ US','$240','#34d399'],['← UK','$89','#ef4444'],['→ TR','$55','#34d399']].forEach(([name,amt,c],i) => {
+      ctx.fillStyle='rgba(255,255,255,0.04)';
+      rr(ctx,sx+4*S, txY+i*18*S, sw-8*S, 15*S, 3); ctx.fill();
+      ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`${5*S}px sans-serif`;
+      ctx.fillText(name, sx+8*S, txY+i*18*S+9*S);
+      ctx.fillStyle=c; ctx.font=`bold ${6*S}px sans-serif`;
+      ctx.fillText(amt, sx+sw-24*S, txY+i*18*S+9*S);
+    });
+
+    // Background glow
+    const glow=ctx.createRadialGradient(W*0.15,H*0.5,0,W*0.15,H*0.5,W*0.3);
+    glow.addColorStop(0,'rgba(59,130,246,0.08)'); glow.addColorStop(1,'transparent');
+    ctx.fillStyle=glow; ctx.fillRect(0,0,W,H);
+    const glow2=ctx.createRadialGradient(W*0.85,H*0.5,0,W*0.85,H*0.5,W*0.3);
+    glow2.addColorStop(0,'rgba(232,168,56,0.06)'); glow2.addColorStop(1,'transparent');
+    ctx.fillStyle=glow2; ctx.fillRect(0,0,W,H);
+  }
+
+  // ── 4. Fringe Interior: design platform ──
+  function drawFringe() {
+    const el=document.getElementById('mock-fringe');
+    if(!el)return;
+    const W=el.offsetWidth||300, H=el.offsetHeight||169;
+    el.width=W*devicePixelRatio; el.height=H*devicePixelRatio;
+    const ctx=el.getContext('2d'); ctx.scale(devicePixelRatio,devicePixelRatio);
+    const S=W/300;
+
+    ctx.fillStyle='#0f1118'; ctx.fillRect(0,0,W,H);
+
+    // Top bar
+    ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fillRect(0,0,W,24*S);
+    ctx.fillStyle=GOLD; ctx.font=`bold ${8*S}px sans-serif`;
+    ctx.fillText('Fringe Interior', 10*S, 15*S);
+    ['Products','Rooms','Export'].forEach((t,i)=>{
+      ctx.fillStyle=MUTED2; ctx.font=`${7*S}px sans-serif`;
+      ctx.fillText(t, (90+i*60)*S, 15*S);
+    });
+
+    // Left product panel
+    const panW=W*0.28;
+    ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,24*S,panW,H-24*S);
+    ctx.fillStyle='rgba(255,255,255,0.5)'; ctx.font=`${6*S}px sans-serif`;
+    ctx.fillText('Products', 8*S, 36*S);
+    ['Sofa — Nilo','Chair — Arc','Table — Oak','Lamp — Cira'].forEach((name,i)=>{
+      rr(ctx,6*S, (44+i*24)*S, panW-12*S, 18*S, 3);
+      ctx.fillStyle=i===1?'rgba(232,168,56,0.12)':'rgba(255,255,255,0.04)'; ctx.fill();
+      ctx.fillStyle=i===1?GOLD:MUTED2; ctx.font=`${6*S}px sans-serif`;
+      ctx.fillText(name, 10*S, (56+i*24)*S);
+    });
+
+    // Main canvas area — room view
+    const cx=panW+8*S, cw=W-panW-16*S, cy=32*S, ch=H-40*S;
+    rr(ctx,cx,cy,cw,ch,5);
+    const roomBg=ctx.createLinearGradient(cx,cy,cx,cy+ch);
+    roomBg.addColorStop(0,'#1a1a22'); roomBg.addColorStop(1,'#151520');
+    ctx.fillStyle=roomBg; ctx.fill();
+    ctx.strokeStyle=MUTED; ctx.lineWidth=0.5; ctx.stroke();
+
+    // Floor perspective lines
+    ctx.strokeStyle='rgba(255,255,255,0.05)'; ctx.lineWidth=1;
+    const vp={x:cx+cw/2, y:cy+ch*0.35};
+    [[cx,cy+ch],[cx+cw,cy+ch],[cx+cw*0.1,cy+ch],[cx+cw*0.9,cy+ch]].forEach(([ex,ey])=>{
+      ctx.beginPath(); ctx.moveTo(vp.x,vp.y); ctx.lineTo(ex,ey); ctx.stroke();
+    });
+
+    // Sofa shape
+    const sfx=cx+cw*0.25, sfy=cy+ch*0.5, sfw=cw*0.5, sfh=ch*0.28;
+    rr(ctx,sfx,sfy,sfw,sfh,6);
+    ctx.fillStyle='rgba(120,100,80,0.6)'; ctx.fill();
+    // cushions
+    rr(ctx,sfx+4*S,sfy+4*S,sfw/2-8*S,sfh-8*S,4);
+    ctx.fillStyle='rgba(150,120,90,0.6)'; ctx.fill();
+    rr(ctx,sfx+sfw/2+4*S,sfy+4*S,sfw/2-8*S,sfh-8*S,4);
+    ctx.fillStyle='rgba(150,120,90,0.6)'; ctx.fill();
+
+    // Measurement overlay lines
+    ctx.strokeStyle='rgba(232,168,56,0.5)'; ctx.setLineDash([3,3]); ctx.lineWidth=0.5;
+    ctx.beginPath(); ctx.moveTo(sfx,sfy+sfh+4*S); ctx.lineTo(sfx+sfw,sfy+sfh+4*S); ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.fillStyle=GOLD; ctx.font=`${6*S}px sans-serif`;
+    ctx.fillText('220cm', sfx+sfw/2-10*S, sfy+sfh+12*S);
+  }
+
+  // ── 5. Sports: dashboard ──
+  function drawSports() {
+    const el=document.getElementById('mock-sports');
+    if(!el)return;
+    const W=el.offsetWidth||300, H=el.offsetHeight||169;
+    el.width=W*devicePixelRatio; el.height=H*devicePixelRatio;
+    const ctx=el.getContext('2d'); ctx.scale(devicePixelRatio,devicePixelRatio);
+    const S=W/300;
+
+    ctx.fillStyle='#0c1218'; ctx.fillRect(0,0,W,H);
+
+    // Sidebar
+    ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,40*S,H);
+    [20,50,80,110].forEach(y=>{
+      ctx.fillStyle=y===20?GOLD_DIM:MUTED;
+      ctx.fillRect(12*S,(y-6)*S,16*S,12*S);
+    });
+
+    const cx=48*S;
+    // Stats row
+    const stats=[['150k','Users'],['120','Facilities'],['2×','Revenue'],['40%','Less Admin']];
+    stats.forEach(([num,label],i)=>{
+      const sx=cx+i*(W-cx-8*S)/4, sw=(W-cx-16*S)/4-4*S;
+      rr(ctx,sx,8*S,sw,34*S,4);
+      ctx.fillStyle='rgba(255,255,255,0.04)'; ctx.fill();
+      ctx.strokeStyle=i===0?'rgba(232,168,56,0.3)':MUTED; ctx.lineWidth=0.5; ctx.stroke();
+      ctx.fillStyle=i===0?GOLD:WHITE; ctx.font=`bold ${9*S}px sans-serif`;
+      ctx.fillText(num, sx+6*S, 24*S);
+      ctx.fillStyle=MUTED2; ctx.font=`${5*S}px sans-serif`;
+      ctx.fillText(label, sx+6*S, 34*S);
+    });
+
+    // Bar chart
+    const chartY=50*S, chartH=H-60*S, chartX=cx;
+    const bars=[0.4,0.65,0.5,0.8,0.6,0.9,1.0,0.85,0.7,0.75,0.88,0.95];
+    const bw=(W-cx-16*S)/bars.length - 3*S;
+    bars.forEach((v,i)=>{
+      const bh=v*chartH*0.75, bx=chartX+i*(bw+3*S), by=chartY+chartH-bh;
+      rr(ctx,bx,by,bw,bh,2);
+      const grad=ctx.createLinearGradient(0,by,0,by+bh);
+      grad.addColorStop(0,i===11?GOLD:'rgba(59,130,246,0.7)');
+      grad.addColorStop(1,'rgba(0,0,0,0.1)');
+      ctx.fillStyle=grad; ctx.fill();
+    });
+
+    // Calendar strip at bottom
+    rr(ctx,cx,H-18*S,W-cx-8*S,14*S,3);
+    ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fill();
+    ['Mo','Tu','We','Th','Fr','Sa','Su'].forEach((d,i)=>{
+      const dx=cx+8*S+i*(W-cx-24*S)/7;
+      ctx.fillStyle=i===2?GOLD:MUTED2; ctx.font=`${5*S}px sans-serif`;
+      ctx.fillText(d, dx, H-9*S);
+      if(i===2){
+        ctx.fillStyle='rgba(232,168,56,0.3)';
+        ctx.beginPath(); ctx.arc(dx+4*S, H-5*S, 2*S, 0, Math.PI*2); ctx.fill();
+      }
+    });
+  }
+
+  // ── 6. Book Reader: reading app ──
+  function drawBookReader() {
+    const el=document.getElementById('mock-bookreader');
+    if(!el)return;
+    const W=el.offsetWidth||300, H=el.offsetHeight||169;
+    el.width=W*devicePixelRatio; el.height=H*devicePixelRatio;
+    const ctx=el.getContext('2d'); ctx.scale(devicePixelRatio,devicePixelRatio);
+    const S=W/300;
+
+    const bg=ctx.createLinearGradient(0,0,W,H);
+    bg.addColorStop(0,'#12100e'); bg.addColorStop(1,'#1a1614');
+    ctx.fillStyle=bg; ctx.fillRect(0,0,W,H);
+
+    // Warm tint overlay
+    ctx.fillStyle='rgba(232,168,56,0.02)'; ctx.fillRect(0,0,W,H);
+
+    // Shelf / bookshelf at left
+    const shelfW=W*0.22;
+    ctx.fillStyle='rgba(255,255,255,0.03)'; ctx.fillRect(0,0,shelfW,H);
+    ctx.fillStyle='rgba(255,255,255,0.06)'; ctx.fillRect(0,H-8*S,shelfW,8*S);
+
+    // Book spines on shelf
+    const spineColors=['#c0392b','#2980b9','#27ae60','#8e44ad','#d35400','#e8a838'];
+    spineColors.forEach((c,i)=>{
+      const sw=12*S, sh=50*S+Math.random()*20*S, sx=4*S+i*14*S, sy=H-8*S-sh;
+      rr(ctx,sx,sy,sw,sh,1);
+      ctx.fillStyle=c; ctx.fill();
+      // spine text
+      ctx.save(); ctx.translate(sx+sw/2,sy+sh/2);
+      ctx.rotate(-Math.PI/2);
+      ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font=`${5*S}px sans-serif`;
+      ctx.fillText('Book', -12*S, 2*S);
+      ctx.restore();
+    });
+
+    // Open book / reading area
+    const bx=shelfW+10*S, by=12*S, bw=W-shelfW-18*S, bh=H-24*S;
+    rr(ctx,bx,by,bw,bh,5);
+    ctx.fillStyle='#1e1a14'; ctx.fill();
+    ctx.strokeStyle='rgba(232,168,56,0.15)'; ctx.lineWidth=0.5; ctx.stroke();
+
+    // Book pages (left/right)
+    const mid=bx+bw/2;
+    ctx.strokeStyle='rgba(255,255,255,0.06)'; ctx.lineWidth=1;
+    ctx.beginPath(); ctx.moveTo(mid,by+6*S); ctx.lineTo(mid,by+bh-6*S); ctx.stroke();
+
+    // Text lines on pages
+    const lineColors=['rgba(255,255,255,0.3)','rgba(255,255,255,0.2)','rgba(255,255,255,0.25)'];
+    [[bx+8*S, mid-6*S],[mid+6*S, bx+bw-6*S]].forEach(([lx,rx])=>{
+      const pw=rx-lx;
+      for(let i=0;i<7;i++){
+        rr(ctx,lx, by+14*S+i*14*S, pw*(0.6+Math.random()*0.4), 4*S, 1);
+        ctx.fillStyle=lineColors[i%3]; ctx.fill();
+      }
+    });
+
+    // Progress bar
+    rr(ctx,bx+6*S, by+bh-10*S, bw-12*S, 4*S, 2);
+    ctx.fillStyle='rgba(255,255,255,0.07)'; ctx.fill();
+    rr(ctx,bx+6*S, by+bh-10*S, (bw-12*S)*0.62, 4*S, 2);
+    ctx.fillStyle=GOLD; ctx.fill();
+    ctx.fillStyle=MUTED2; ctx.font=`${5*S}px sans-serif`;
+    ctx.fillText('62% · Page 148', bx+6*S, by+bh-2*S);
+
+    // Soft vignette
+    const vig=ctx.createRadialGradient(W/2,H/2,H*0.3,W/2,H/2,H*0.8);
+    vig.addColorStop(0,'transparent'); vig.addColorStop(1,'rgba(0,0,0,0.4)');
+    ctx.fillStyle=vig; ctx.fillRect(0,0,W,H);
+  }
+
+  // Run all after layout is ready
+  function drawAllMocks() {
+    drawVibe(); drawRealEstate(); drawFlexMoney();
+    drawFringe(); drawSports(); drawBookReader();
+  }
+
+  if (document.readyState === 'complete') drawAllMocks();
+  else window.addEventListener('load', drawAllMocks);
+  window.addEventListener('resize', drawAllMocks);
+  </script>
+
+  <script>
+    // ── Cursor ──
+    const cursor = document.getElementById('cursor');
+    const ring   = document.getElementById('cursor-ring');
+    let mx = 0, my = 0, rx = 0, ry = 0;
+    document.addEventListener('mousemove', e => { mx = e.clientX; my = e.clientY; });
+    function animCursor() {
+      rx += (mx - rx) * 0.12; ry += (my - ry) * 0.12;
+      cursor.style.left = mx + 'px'; cursor.style.top = my + 'px';
+      ring.style.left   = rx + 'px'; ring.style.top  = ry + 'px';
+      requestAnimationFrame(animCursor);
+    }
+    animCursor();
+
+    // ── Canvas particles ──
+    const canvas = document.getElementById('canvas-bg');
+    const ctx2   = canvas.getContext('2d');
+    function resizeBg() { canvas.width = window.innerWidth; canvas.height = window.innerHeight; }
+    resizeBg(); window.addEventListener('resize', resizeBg);
+
+    const CHARS = ['0','1','{','}','(',')','=>','<','>','/','*','#','@','$'];
+    const particles = Array.from({length: 60}, () => ({
+      x: Math.random() * window.innerWidth,
+      y: Math.random() * window.innerHeight,
+      vy: Math.random() * 0.4 + 0.15,
+      vx: (Math.random() - 0.5) * 0.1,
+      char: CHARS[Math.floor(Math.random() * CHARS.length)],
+      alpha: Math.random() * 0.4 + 0.05,
+      size: Math.floor(Math.random() * 8 + 10),
+      timer: 0,
+      interval: Math.floor(Math.random() * 200 + 100),
+    }));
+
+    function drawParticles() {
+      ctx2.clearRect(0, 0, canvas.width, canvas.height);
+      particles.forEach(p => {
+        p.y += p.vy; p.x += p.vx; p.timer++;
+        if (p.timer > p.interval) { p.char = CHARS[Math.floor(Math.random()*CHARS.length)]; p.timer = 0; }
+        if (p.y > canvas.height + 20) { p.y = -20; p.x = Math.random() * canvas.width; }
+        ctx2.fillStyle = `rgba(232,168,56,${p.alpha})`;
+        ctx2.font = `${p.size}px JetBrains Mono, monospace`;
+        ctx2.fillText(p.char, p.x, p.y);
+      });
+      requestAnimationFrame(drawParticles);
+    }
+    drawParticles();
+
+    // ── Nav scroll ──
+    window.addEventListener('scroll', () => {
+      document.getElementById('nav').classList.toggle('scrolled', window.scrollY > 40);
+    });
+
+    // ── Reveal on scroll ──
+    const reveals = document.querySelectorAll('.reveal');
+    const observer = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); } });
+    }, { threshold: 0.12 });
+    reveals.forEach(el => observer.observe(el));
+
+    // ── Marquee ──
+    const marqueeItems = [
+      'Flutter', 'WebRTC', 'LiveKit', 'Riverpod', 'C#', 'ASP.NET',
+      'WebSocket', 'JSON-RPC 2.0', '.NET Core', 'Dart', 'Python', 'FastAPI',
+      'SQL Server', 'Real-Time Systems', 'iOS & Android', 'Mobile-First', 'ERP Integration', 'Firebase'
+    ];
+    const track = document.getElementById('marqueeTrack');
+    const buildMarquee = () => marqueeItems.map(t => `<span class="marquee-item"><span>◆</span> ${t} </span>`).join('');
+    track.innerHTML = buildMarquee() + buildMarquee();
+
+    // ── Skill bar animation ──
+    document.querySelectorAll('.skill-bar').forEach(bar => {
+      const w = bar.style.width; bar.style.width = '0';
+      setTimeout(() => bar.style.width = w, 500);
+    });
+  </script>
+</body>
+</html>
