@@ -151,7 +151,7 @@
       font-family: var(--serif);
       font-style: italic;
       font-weight: 300;
-      font-size: clamp(13px, 1.2vw, 16px);
+      font-size: clamp(15px, 1.2vw, 16px);
       color: var(--muted2);
       margin-bottom: 36px;
       line-height: 1.65;
@@ -159,7 +159,7 @@
     }
     .hero-title { display: none; }
     .hero-desc {
-      font-size: 15px;
+      font-size: 16px;
       line-height: 1.75;
       color: var(--muted2);
       max-width: 440px;
@@ -316,7 +316,7 @@
       align-items: start;
     }
     .about-text p {
-      font-size: 17px; line-height: 1.8;
+      font-size: 18px; line-height: 1.85;
       color: var(--muted2);
       margin-bottom: 24px;
     }
@@ -414,7 +414,7 @@
       display: flex; flex-direction: column; flex: 1;
     }
     .project-desc {
-      font-size: 14px; line-height: 1.7;
+      font-size: 16px; line-height: 1.7;
       color: var(--muted2);
       margin: 8px 0 14px;
     }
@@ -481,7 +481,7 @@
       display: flex; flex-direction: column; gap: 8px;
     }
     .exp-bullets li {
-      font-size: 14px; line-height: 1.65;
+      font-size: 16px; line-height: 1.7;
       color: var(--muted2);
       padding-left: 18px;
       position: relative;
@@ -557,6 +557,60 @@
     .reveal-delay-3 { transition-delay: .3s; }
     .reveal-delay-4 { transition-delay: .4s; }
 
+
+    /* ── Language Switcher ── */
+    .lang-switcher {
+      display: flex; align-items: center; gap: 2px;
+      margin-left: 32px;
+    }
+    .lang-btn {
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: .14em; text-transform: uppercase;
+      padding: 6px 12px;
+      background: transparent;
+      color: var(--muted);
+      border: 1px solid transparent;
+      cursor: pointer;
+      transition: color .2s, border-color .2s;
+    }
+    .lang-btn.active {
+      color: var(--gold);
+      border-color: rgba(232,168,56,.35);
+    }
+    .lang-btn:hover { color: var(--gold); }
+
+    /* ── Project link button ── */
+    .project-link {
+      display: inline-flex; align-items: center; gap: 7px;
+      margin-top: 14px;
+      font-family: var(--mono); font-size: 11px;
+      letter-spacing: .1em; text-transform: uppercase;
+      color: var(--gold);
+      text-decoration: none;
+      border-bottom: 1px solid rgba(232,168,56,.3);
+      padding-bottom: 2px;
+      transition: border-color .2s, gap .2s;
+      align-self: flex-start;
+    }
+    .project-link:hover { border-color: var(--gold); gap: 11px; }
+    .project-link.private {
+      color: var(--muted); border-color: rgba(255,255,255,.1);
+      pointer-events: none;
+    }
+
+    /* ── Experience company link ── */
+    .exp-company a {
+      color: inherit; text-decoration: none;
+      border-bottom: 1px solid rgba(232,168,56,.25);
+      transition: border-color .2s;
+    }
+    .exp-company a:hover { border-color: var(--gold); }
+
+    /* ── TR hidden by default ── */
+    [data-tr] { display: none; }
+    body.lang-tr [data-en] { display: none; }
+    body.lang-tr [data-tr] { display: revert; }
+
     /* ── RESPONSIVE ── */
     @media (max-width: 900px) {
       nav { padding: 20px 24px; }
@@ -585,31 +639,36 @@
   <!-- NAV -->
   <nav id="nav">
     <a href="#" class="nav-logo">GJZ<span style="color:var(--muted)">_</span>DEV</a>
-    <ul class="nav-links">
-      <li><a href="#about">About</a></li>
-      <li><a href="#projects">Projects</a></li>
-      <li><a href="#experience">Experience</a></li>
-      <li><a href="#contact">Contact</a></li>
-    </ul>
+    <div style="display:flex;align-items:center;gap:0">
+      <ul class="nav-links">
+        <li><a href="#about"><span data-en>About</span><span data-tr>Hakkımda</span></a></li>
+        <li><a href="#projects"><span data-en>Projects</span><span data-tr>Projeler</span></a></li>
+        <li><a href="#experience"><span data-en>Experience</span><span data-tr>Deneyim</span></a></li>
+        <li><a href="#contact"><span data-en>Contact</span><span data-tr>İletişim</span></a></li>
+      </ul>
+      <div class="lang-switcher">
+        <button class="lang-btn active" onclick="setLang('en')">EN</button>
+        <button class="lang-btn" onclick="setLang('tr')">TR</button>
+      </div>
+    </div>
   </nav>
 
   <!-- HERO -->
   <section id="hero">
     <div class="hero-left">
-      <div class="hero-eyebrow reveal">Senior Software Developer</div>
+      <div class="hero-eyebrow reveal"><span data-en>Senior Software Developer</span><span data-tr>Kıdemli Yazılım Geliştirici</span></div>
       <h1 class="hero-name reveal reveal-delay-1">
         Goudarz<br/><span>Javadi</span><br/>Zadeh
       </h1>
-      <p class="hero-slogan reveal reveal-delay-2">Flutter architect. Real-time systems. Clean code, always.</p>
-      <p class="hero-slogan-sub reveal reveal-delay-3">I turn complex ideas into cross-platform products that scale — from concept to production.</p>
+      <p class="hero-slogan reveal reveal-delay-2"><span data-en>Flutter architect. Real-time systems. Clean code, always.</span><span data-tr>Flutter mimarı. Gerçek zamanlı sistemler. Her zaman temiz kod.</span></p>
+      <p class="hero-slogan-sub reveal reveal-delay-3"><span data-en>I turn complex ideas into cross-platform products that scale — from concept to production.</span><span data-tr>Karmaşık fikirleri ölçeklenebilir, çok platformlu ürünlere dönüştürüyorum — konseptten üretime.</span></p>
       <p class="hero-desc reveal reveal-delay-3">
-        25+ years crafting digital products across mobile, backend, and real-time systems.
-        Specialising in Flutter/Dart, live voice &amp; video platforms, and full-stack integrations
-        that work at scale.
+        <span data-en>25+ years crafting digital products across mobile, backend, and real-time systems. Specialising in Flutter/Dart, live voice &amp; video platforms, and full-stack integrations that work at scale.</span>
+        <span data-tr>25+ yıldır mobil, backend ve gerçek zamanlı sistemler üzerinde dijital ürünler geliştiriyorum. Flutter/Dart, canlı ses &amp; video platformları ve ölçeklenebilir entegrasyonlar konusunda uzmanım.</span>
       </p>
       <div class="hero-ctas reveal reveal-delay-4">
-        <a href="#projects" class="btn-primary">View Projects →</a>
-        <a href="#contact" class="btn-secondary">Let's Talk</a>
+        <a href="#projects" class="btn-primary"><span data-en>View Projects →</span><span data-tr>Projeleri Gör →</span></a>
+        <a href="#contact" class="btn-secondary"><span data-en>Let's Talk</span><span data-tr>İletişime Geç</span></a>
       </div>
     </div>
 
@@ -617,24 +676,24 @@
       <div class="hero-stat-grid">
         <div class="stat-card">
           <div class="stat-num">25<span>+</span></div>
-          <div class="stat-label">Years Experience</div>
+          <div class="stat-label"><span data-en>Years Experience</span><span data-tr>Yıl Deneyim</span></div>
         </div>
         <div class="stat-card">
           <div class="stat-num">150<span>k+</span></div>
-          <div class="stat-label">Users Served</div>
+          <div class="stat-label"><span data-en>Users Served</span><span data-tr>Kullanıcı</span></div>
         </div>
         <div class="stat-card">
           <div class="stat-num">6</div>
-          <div class="stat-label">Companies</div>
+          <div class="stat-label"><span data-en>Companies</span><span data-tr>Şirket</span></div>
         </div>
         <div class="stat-card">
           <div class="stat-num">30<span>M+</span></div>
-          <div class="stat-label">Records Processed</div>
+          <div class="stat-label"><span data-en>Records Processed</span><span data-tr>İşlenen Kayıt</span></div>
         </div>
       </div>
       <div class="hero-availability">
         <div class="avail-dot"></div>
-        Available for freelance &amp; consulting engagements
+        <span data-en>Available for freelance &amp; consulting engagements</span><span data-tr>Freelance &amp; danışmanlık projeleri için müsaitim</span>
       </div>
     </div>
   </section>
@@ -650,25 +709,22 @@
   <section id="about">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">01 — About</span>
+        <span class="section-label">01 — <span data-en>About</span><span data-tr>Hakkımda</span></span>
         <div class="section-rule"></div>
       </div>
       <div class="about-grid">
         <div class="about-text">
           <p class="reveal">
-            I'm a <strong>senior software developer with 25+ years of experience</strong>, based in Istanbul.
-            My career spans real-time social platforms, enterprise ERP systems, fintech apps, and large-scale data
-            solutions — built with precision, performance, and clean architecture at the forefront.
+            <span data-en>I'm a <strong>senior software developer with 25+ years of experience</strong>, based in Istanbul. My career spans real-time social platforms, enterprise ERP systems, fintech apps, and large-scale data solutions — built with precision, performance, and clean architecture at the forefront.</span>
+            <span data-tr>İstanbul merkezli, <strong>25+ yıl deneyime sahip kıdemli bir yazılım geliştiriciyim</strong>. Kariyerim; gerçek zamanlı sosyal platformlar, kurumsal ERP sistemleri, fintech uygulamaları ve büyük ölçekli veri çözümlerini kapsıyor.</span>
           </p>
           <p class="reveal reveal-delay-1">
-            Today I focus on <em>Flutter &amp; real-time systems</em> — building cross-platform mobile products
-            that feel native, backed by rock-solid backends. From 150,000-user reservation platforms to live
-            WebRTC social apps, I own the full stack when needed.
+            <span data-en>Today I focus on <em>Flutter &amp; real-time systems</em> — building cross-platform mobile products that feel native, backed by rock-solid backends. From 150,000-user reservation platforms to live WebRTC social apps, I own the full stack when needed.</span>
+            <span data-tr>Bugün <em>Flutter &amp; gerçek zamanlı sistemler</em> üzerine yoğunlaşıyorum. 150.000 kullanıcılı rezervasyon platformlarından canlı WebRTC sosyal uygulamalarına kadar, gerektiğinde tüm stack'e sahip çıkıyorum.</span>
           </p>
           <p class="reveal reveal-delay-2">
-            I started mobile before cross-platform frameworks even existed — writing Objective-C readers for
-            bookshops in 2010. That foundation means I understand the platform deeply, not just the framework.
-            <strong>I don't just write code. I architect systems that last.</strong>
+            <span data-en>I started mobile before cross-platform frameworks even existed — writing Objective-C readers for bookshops in 2010. That foundation means I understand the platform deeply, not just the framework. <strong>I don't just write code. I architect systems that last.</strong></span>
+            <span data-tr>Cross-platform framework'ler var olmadan önce, 2010'da kitapçılar için Objective-C okuyucu yazarak mobil geliştirmeye başladım. <strong>Sadece kod yazmıyorum. Kalıcı sistemler inşa ediyorum.</strong></span>
           </p>
         </div>
         <div class="skills-grid reveal reveal-delay-1">
@@ -689,7 +745,7 @@
   <section id="projects">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">02 — Projects</span>
+        <span class="section-label">02 — <span data-en>Projects</span><span data-tr>Projeler</span></span>
         <div class="section-rule"></div>
       </div>
       <div class="projects-grid">
@@ -699,7 +755,8 @@
           <div class="project-visual">
             <img src="Images/Vibe.jpg" style="width:100%;height:100%;object-fit:cover">
             <div class="project-overlay">
-              <p class="overlay-desc">VIBE Social — Built real-time social platform in Flutter featuring live voice & video rooms, 
+              <p class="overlay-desc">
+                VIBE Social — Built real-time social platform in Flutter featuring live voice & video rooms, 
                 instant messaging, community discovery, and multiplayer in-app games. Implemented WebRTC 
                 for peer-to-peer audio/video streaming, LiveKit for room orchestration, WebSocket/JSON-RPC 
                 for real-time chat and game state synchronization, and Riverpod for state management — all 
@@ -707,13 +764,17 @@
             </div>
           </div>
           <div class="project-body">
-            <div class="project-num">01 — Flagship</div>
+            <div class="project-num">01 — <span data-en>Flagship</span><span data-tr>Amiral Gemisi</span></div>
             <div class="project-name">VIBE — Real-Time Social Platform</div>
             <div class="project-meta">DGN Tech Inc. · 2026 · iOS &amp; Android</div>
-            <p class="project-desc">Live voice &amp; video rooms, instant messaging, community discovery, and multiplayer games — all from a single Flutter codebase for iOS &amp; Android.</p>
+            <p class="project-desc">
+              <span data-en>Live voice &amp; video rooms, instant messaging, community discovery, and multiplayer games — all from a single Flutter codebase for iOS &amp; Android.</span>
+              <span data-tr>Canlı ses &amp; video odaları, anlık mesajlaşma, topluluk keşfi ve çok oyunculu oyunlar — tek bir Flutter codebase'den iOS &amp; Android için.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Flutter</span><span class="tag">LiveKit</span><span class="tag">WebRTC</span><span class="tag">WebSocket</span><span class="tag">JSON-RPC 2.0</span><span class="tag">Riverpod</span>
             </div>
+            <a href="#" class="project-link private">🔒 <span data-en>Private Project</span><span data-tr>Özel Proje</span></a>
           </div>
         </div>
         
@@ -730,10 +791,14 @@
             <div class="project-num">02</div>
             <div class="project-name">Emekdis Dentistry Website</div>
             <div class="project-meta">May–Jun 2026</div>
-            <p class="project-desc">I developed a dynamic website for Emekdis Polikliniği using Next.js, featuring a custom control panel for real-time, user-friendly content management. This high-performance, responsive platform streamlines patient access to clinical services and enables easy, autonomous updates for staff. </p>
+            <p class="project-desc">
+              <span data-en>Dynamic website for Emekdis Polikliniği using Next.js with a custom control panel for real-time content management. High-performance, responsive platform streamlining patient access to clinical services.</span>
+              <span data-tr>Emekdis Polikliniği için Next.js ile geliştirilmiş dinamik web sitesi. Gerçek zamanlı içerik yönetimi için özel kontrol paneli. Yüksek performanslı, duyarlı platform.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Next.js</span><span class="tag">PostgreSQL</span>
             </div>
+            <a href="https://emekdis.vercel.app/tr" target="_blank" class="project-link">↗ <span data-en>Visit Site</span><span data-tr>Siteyi Ziyaret Et</span></a>
           </div>
         </div>
 
@@ -748,11 +813,15 @@
           <div class="project-body">
             <div class="project-num">03</div>
             <div class="project-name">Istanbul Real Estate App</div>
-            <div class="project-meta">Jan – Jul 2024 · 1,000+ users</div>
-            <p class="project-desc">Solo-crafted Flutter app with C# backend for an Istanbul real estate firm — 1,000+ users, 25% faster load times.</p>
+            <div class="project-meta">Jan – Jul 2024 · 1,000+ <span data-en>users</span><span data-tr>kullanıcı</span></div>
+            <p class="project-desc">
+              <span data-en>Solo-crafted Flutter app with C# backend for an Istanbul real estate firm — 1,000+ users, 25% faster load times.</span>
+              <span data-tr>İstanbul'daki bir emlak firması için C# backend ile tek başıma geliştirdiğim Flutter uygulaması — 1.000+ kullanıcı, %25 daha hızlı yükleme.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Flutter</span><span class="tag">C#</span><span class="tag">SQL Server</span><span class="tag">ASP.NET</span>
             </div>
+            <a href="#" class="project-link private">🔒 <span data-en>Private Project</span><span data-tr>Özel Proje</span></a>
           </div>
         </div>
 
@@ -767,11 +836,15 @@
           <div class="project-body">
             <div class="project-num">04</div>
             <div class="project-name">Flex Money</div>
-            <div class="project-meta">Sep – Oct 2023 · 3,000+ downloads</div>
-            <p class="project-desc">Global money transfer app with Figma-driven UI. 3,000+ downloads in 6 months, 20% faster transaction times.</p>
+            <div class="project-meta">Sep – Oct 2023 · 3,000+ <span data-en>downloads</span><span data-tr>indirme</span></div>
+            <p class="project-desc">
+              <span data-en>Global money transfer app with Figma-driven UI. 3,000+ downloads in 6 months, 20% faster transaction times.</span>
+              <span data-tr>Figma tabanlı UI ile global para transfer uygulaması. 6 ayda 3.000+ indirme, %20 daha hızlı işlem süresi.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Flutter</span><span class="tag">Dart</span><span class="tag">Figma</span>
             </div>
+            <a href="https://play.google.com/store/apps/details?id=com.bc.flexmoney&hl=fr" target="_blank" class="project-link">↗ <span data-en>Google Play</span><span data-tr>Google Play</span></a>
           </div>
         </div>
 
@@ -786,11 +859,15 @@
           <div class="project-body">
             <div class="project-num">05</div>
             <div class="project-name">Fringe Interior Platform</div>
-            <div class="project-meta">2022 – 2024 · 1,000 users</div>
-            <p class="project-desc">Compressed interior design workflows from 1 week to 30 minutes. +35% performance, +20% engagement, mobile ERP via Flutter.</p>
+            <div class="project-meta">2022 – 2024 · 1,000 <span data-en>users</span><span data-tr>kullanıcı</span></div>
+            <p class="project-desc">
+              <span data-en>Compressed interior design workflows from 1 week to 30 minutes. +35% performance, +20% engagement, mobile ERP via Flutter.</span>
+              <span data-tr>İç tasarım iş akışlarını 1 haftadan 30 dakikaya indirdi. +%35 performans, +%20 etkileşim artışı, Flutter ile mobil ERP.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Flutter</span><span class="tag">ASP.NET Web API</span><span class="tag">SQL Server</span><span class="tag">ERP</span>
             </div>
+            <a href="https://www.fringeinterior.com/" target="_blank" class="project-link">↗ <span data-en>Visit Site</span><span data-tr>Siteyi Ziyaret Et</span></a>
           </div>
         </div>
 
@@ -806,10 +883,14 @@
             <div class="project-num">06</div>
             <div class="project-name">Fringe Interior Mobile App</div>
             <div class="project-meta">2022 – 2024</div>
-            <p class="project-desc">Compressed interior design workflows from 1 week to 30 minutes. +35% performance, +20% engagement, mobile ERP via Flutter.</p>
+            <p class="project-desc">
+              <span data-en>Flutter mobile companion to the Fringe platform — enterprise ERP features on mobile, enabling field teams to manage interior design orders on the go.</span>
+              <span data-tr>Fringe platformunun Flutter mobil uygulaması — saha ekiplerinin iç tasarım siparişlerini hareket halinde yönetmesini sağlayan kurumsal ERP özellikleri.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Flutter</span><span class="tag">ASP.NET Web API</span><span class="tag">SQL Server</span><span class="tag">ERP</span>
             </div>
+            <a href="#" class="project-link private">🔒 <span data-en>Private Project</span><span data-tr>Özel Proje</span></a>
           </div>
         </div>
 
@@ -824,11 +905,15 @@
           <div class="project-body">
             <div class="project-num">07</div>
             <div class="project-name">Sports Reservation Platform</div>
-            <div class="project-meta">2019 – 2022 · 150,000+ users</div>
-            <p class="project-desc">Reservation system for 120 sports facilities. Scaled to 150,000+ users, 2× revenue growth, admin workload cut 40%.</p>
+            <div class="project-meta">2019 – 2022 · 150,000+ <span data-en>users</span><span data-tr>kullanıcı</span></div>
+            <p class="project-desc">
+              <span data-en>Reservation system for 120 sports facilities. Scaled to 150,000+ users, 2× revenue growth, admin workload cut 40%.</span>
+              <span data-tr>120 spor tesisi için rezervasyon sistemi. 150.000+ kullanıcıya ölçeklendi, 2× gelir artışı, idari iş yükü %40 azaldı.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">.NET Core</span><span class="tag">SQL Server</span><span class="tag">RESTful API</span>
             </div>
+            <a href="#" class="project-link private">🔒 <span data-en>Private Project</span><span data-tr>Özel Proje</span></a>
           </div>
         </div>
 
@@ -843,11 +928,15 @@
           <div class="project-body">
             <div class="project-num">08</div>
             <div class="project-name">Mobile Book Reader</div>
-            <div class="project-meta">Apr – Nov 2010 · 30+ bookshops</div>
-            <p class="project-desc">Mobile book reader &amp; retail app in Objective-C for 30+ bookshops. Grew digital readership 25% — before cross-platform existed.</p>
+            <div class="project-meta">Apr – Nov 2010 · 30+ <span data-en>bookshops</span><span data-tr>kitapçı</span></div>
+            <p class="project-desc">
+              <span data-en>Mobile book reader &amp; retail app in Objective-C for 30+ bookshops. Grew digital readership 25% — before cross-platform existed.</span>
+              <span data-tr>30+ kitapçı için Objective-C ile geliştirilmiş mobil kitap okuyucu. Cross-platform framework'ler yokken dijital okuyucu kitlesini %25 büyüttü.</span>
+            </p>
             <div class="overlay-tags" style="margin-top:auto">
               <span class="tag">Objective-C</span><span class="tag">iOS</span><span class="tag">Mobile-First</span>
             </div>
+            <a href="#" class="project-link private">🔒 <span data-en>Archived Project</span><span data-tr>Arşivlenmiş Proje</span></a>
           </div>
         </div>
 
@@ -859,7 +948,7 @@
   <section id="experience">
     <div class="container">
       <div class="section-header reveal">
-        <span class="section-label">03 — Experience</span>
+        <span class="section-label">03 — <span data-en>Experience</span><span data-tr>Deneyim</span></span>
         <div class="section-rule"></div>
       </div>
       <div class="exp-list">
@@ -867,12 +956,24 @@
         <div class="exp-item reveal">
           <div class="exp-period">Mar 2026 — Present</div>
           <div>
-            <div class="exp-role">Senior Software Engineer</div>
-            <div class="exp-company">DGN Tech Inc. · Part-time · Remote</div>
+            <div class="exp-role"><span data-en>Senior Software Engineer</span><span data-tr>Kıdemli Yazılım Mühendisi</span></div>
+            <div class="exp-company"><a href="https://dgntech.io/" target="_blank">DGN Tech Inc.</a> · <span data-en>Part-time · Remote</span><span data-tr>Yarı zamanlı · Uzaktan</span></div>
             <ul class="exp-bullets">
-              <li>Built VIBE Social — a real-time social platform in Flutter with live voice &amp; video rooms, instant messaging, community discovery, and multiplayer in-app games.</li>
-              <li>Implemented WebRTC for peer-to-peer audio/video, LiveKit for room orchestration, and WebSocket/JSON-RPC for real-time chat and game state sync.</li>
-              <li>Delivered a fully cross-platform product (iOS &amp; Android) from a single Flutter codebase using Riverpod for state management.</li>
+              <li>
+                <span data-en> Built VIBE Social — a real-time social platform in Flutter with live voice &amp; 
+                video rooms, instant messaging, community discovery, and multiplayer in-app games.</span>
+                <span data-tr>Flutter ile canlı ses &amp; video odaları, anlık mesajlaşma, topluluk keşfi ve çok 
+                oyunculu oyunlara sahip gerçek zamanlı sosyal platform VIBE Social'ı geliştirdim.</span>
+              </li>
+              <li>
+                <span data-en>Implemented WebRTC for peer-to-peer audio/video, LiveKit for room orchestration, 
+                and WebSocket/JSON-RPC for real-time chat and game state sync.</span>
+                <span data-tr>Peer-to-peer ses/video için WebRTC, oda orkestrasyonu için LiveKit ve gerçek zamanlı sohbet ve oyun durumu senkronizasyonu için WebSocket/JSON-RPC uyguladım.</span>
+              </li>
+              <li>
+                <span data-en>Delivered a fully cross-platform product (iOS &amp; Android) from a single Flutter codebase using Riverpod for state management.</span>
+                <span data-tr>Single Flutter kod tabanından tamamen çapraz platform ürün (iOS &amp; Android) teslim ettim ve durum yönetimi için Riverpod kullandım.</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -880,12 +981,21 @@
         <div class="exp-item reveal reveal-delay-1">
           <div class="exp-period">2022 — 2024</div>
           <div>
-            <div class="exp-role">Senior Software Developer</div>
-            <div class="exp-company">Fringe Interior · Contract · Remote</div>
+            <div class="exp-role"><span data-en>Senior Software Developer</span><span data-tr>Kıdemli Yazılım Geliştirici</span></div>
+            <div class="exp-company"><a href="https://fringeinterior.com" target="_blank">Fringe Interior</a> · <span data-en>Contract · Remote</span><span data-tr>Sözleşmeli · Uzaktan</span></div>
             <ul class="exp-bullets">
-              <li>Developed a Flutter-based platform that compressed interior design workflows from 1 week to 30 minutes for 1,000 users.</li>
-              <li>Enhanced performance by 35% and drove a 20% rise in engagement through refined feature design.</li>
-              <li>Streamlined SQL Server ERP processes, cutting transaction time by 30% across 10,000+ records, and introduced mobile ERP capabilities.</li>
+              <li>
+                <span data-en>Developed a Flutter-based platform that compressed interior design workflows from 1 week to 30 minutes for 1,000 users.</span>
+                <span data-tr>1,000 kullanıcı için iç mimari süreçlerini 1 haftadan 30 dakikaya sıkıştıran bir Flutter tabanlı platform geliştirdim.</span>
+              </li>
+              <li>
+                <span data-en>Enhanced performance by 35% and drove a 20% rise in engagement through refined feature design.</span>
+                <span data-tr>İyileştirilmiş özellik tasarımı sayesinde performansı %35 artırdım ve katılım oranını %20 artırdım.</span>
+              </li>
+              <li>
+                <span data-en>Streamlined SQL Server ERP processes, cutting transaction time by 30% across 10,000+ records, and introduced mobile ERP capabilities.</span>
+                <span data-tr>SQL Server ERP süreçlerini optimize ettim, 10.000+ kayıtlarda işlem süresini %30 azalttım ve mobil ERP yetenekleri kurdum.</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -893,12 +1003,21 @@
         <div class="exp-item reveal reveal-delay-2">
           <div class="exp-period">Jun 2019 — Jun 2022</div>
           <div>
-            <div class="exp-role">Software Engineer</div>
-            <div class="exp-company">Payam Co. · Contract</div>
+            <div class="exp-role"><span data-en>Software Engineer</span><span data-tr>Yazılım Mühendisi</span></div>
+            <div class="exp-company">Payam Co. · <span data-en>Contract</span><span data-tr>Sözleşmeli</span></div>
             <ul class="exp-bullets">
-              <li>Launched a reservation platform for 120 sports facilities, scaling to 150,000+ users and delivering 2× revenue growth over 3 years.</li>
-              <li>Designed an admin dashboard for class scheduling, membership, and facility management, cutting administrative workload by 40%.</li>
-              <li>Engineered a scalable .NET Core / SQL Server backend with automated accounting that reduced financial processing time by 25%.</li>
+              <li>
+                <span data-en>Launched a reservation platform for 120 sports facilities, scaling to 150,000+ users and delivering 2× revenue growth over 3 years.</span>
+                <span data-tr>120 spor tesisi için bir rezervasyon platformu başlattım, 150.000+ kullanıcıya ölçeklendirildi ve 3 yılda 2 katı gelir büyümesi sağladım.</span>
+              </li>
+              <li>
+                <span data-en>Designed an admin dashboard for class scheduling, membership, and facility management, cutting administrative workload by 40%.</span>
+                <span data-tr>Sınıf zamanlaması, üyelik ve tesis yönetimi için bir yönetici paneli tasarladım, idari iş yükünü %40 azalttım.</span>
+              </li>
+              <li>
+                <span data-en>Engineered a scalable .NET Core / SQL Server backend with automated accounting that reduced financial processing time by 25%.</span>
+                <span data-tr>Otomatik muhasebe ile ölçeklenebilir bir .NET Core / SQL Server arka uç mühendisliği yaptım, finansal işleme süresini %25 azalttım.</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -906,12 +1025,21 @@
         <div class="exp-item reveal">
           <div class="exp-period">Jun 2018 — Jun 2021</div>
           <div>
-            <div class="exp-role">Software Engineer</div>
-            <div class="exp-company">Green Dataware · Full-time · On-site</div>
+            <div class="exp-role"><span data-en>Software Engineer</span><span data-tr>Yazılım Mühendisi</span></div>
+            <div class="exp-company">Green Dataware · <span data-en>Full-time · On-site</span><span data-tr>Tam zamanlı · Ofis</span></div>
             <ul class="exp-bullets">
-              <li>Optimised SQL Server query performance for a high-traffic ERP system, boosting transaction speeds by 30% across 10,000+ records.</li>
-              <li>Refactored WPF desktop application core rendering, reducing load times by 25% for 3,000+ users.</li>
-              <li>Designed modular API architecture to support future Flutter mobile ERP integration across enterprise clients.</li>
+              <li>
+                <span data-en>Optimised SQL Server query performance for a high-traffic ERP system, boosting transaction speeds by 30% across 10,000+ records.</span>
+                <span data-tr>Yüksek trafiğe sahip bir ERP sistemi için SQL Server sorgu performansını optimize ettim, 10.000+ kayıtlarda işlem hızını %30 artırdım.</span>
+              </li>
+              <li>
+                <span data-en>Refactored WPF desktop application core rendering, reducing load times by 25% for 3,000+ users.</span>
+                <span data-tr>WPF masaüstü uygulamasının çekirdek oluşturma sürecini yeniden düzenledim, 3.000+ kullanıcı için yükleme sürelerini %25 azalttım.</span>
+              </li>
+              <li>
+                <span data-en>Designed modular API architecture to support future Flutter mobile ERP integration across enterprise clients.</span>
+                <span data-tr>Gelecekteki Flutter mobil ERP entegrasyonlarını desteklemek için modüler API mimarisi tasarladım.</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -919,12 +1047,21 @@
         <div class="exp-item reveal reveal-delay-1">
           <div class="exp-period">Jun 2007 — Jun 2018</div>
           <div>
-            <div class="exp-role">Software Developer</div>
-            <div class="exp-company">J Publication · Full-time</div>
+            <div class="exp-role"><span data-en>Software Developer</span><span data-tr>Yazılım Geliştirici</span></div>
+            <div class="exp-company">J Publication · <span data-en>Full-time</span><span data-tr>Tam zamanlı</span></div>
             <ul class="exp-bullets">
-              <li>Built a mobile book reader and retail app serving 30+ bookshops, growing digital readership by 25% — early mobile-first thinking before cross-platform frameworks existed.</li>
-              <li>Developed a suite of business applications for sales tracking, production, and resource allocation — improving efficiency 30% and revenue by 20%.</li>
-              <li>Optimised SQL Server performance across 30+ locations, reducing data errors by 15% through query redesign and indexing.</li>
+              <li>
+                <span data-en>Built a mobile book reader and retail app serving 30+ bookshops, growing digital readership by 25% — early mobile-first thinking before cross-platform frameworks existed.</span>
+                <span data-tr>30+ kitap dükkanı hizmet veren mobil bir kitap okuyucu ve perakende uygulaması oluşturdum, çapraz-platform çerçeveler mevcut olmadan önceki mobil öncelikli düşünmeyle dijital okuyucu sayısını %25 artırdım.</span>
+              </li>
+              <li>
+                <span data-en>Developed a suite of business applications for sales tracking, production, and resource allocation — improving efficiency 30% and revenue by 20%.</span>
+                <span data-tr>Satış takibi, üretim ve kaynak atama için bir dizi iş uygulaması geliştirdim — verimliliği %30 ve geliri %20 artırdım.</span>
+              </li>
+              <li>
+                <span data-en>Optimised SQL Server performance across 30+ locations, reducing data errors by 15% through query redesign and indexing.</span>
+                <span data-tr>30+ konumda SQL Server performansını optimize ettim, sorgu yeniden tasarımı ve indeksleme yoluyla veri hatalarını %15 azalttım.</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -932,11 +1069,17 @@
         <div class="exp-item reveal reveal-delay-2">
           <div class="exp-period">Jan 2006 — Dec 2007</div>
           <div>
-            <div class="exp-role">Developer &amp; Data Analyst</div>
-            <div class="exp-company">Cancer Research Center · Hybrid</div>
+            <div class="exp-role"><span data-en>Developer &amp; Data Analyst</span><span data-tr>Geliştirici &amp; Veri Analisti</span></div>
+            <div class="exp-company">Cancer Research Center · <span data-en>Hybrid</span><span data-tr>Hibrit</span></div>
             <ul class="exp-bullets">
-              <li>Designed a data entry system for a 15-year cancer study, handling 30M+ records across 10,000 participants.</li>
-              <li>Enabled precise reporting for researchers — the project that sparked deep SQL Server expertise.</li>
+              <li>
+                <span data-en>Designed a data entry system for a 15-year cancer study, handling 30M+ records across 10,000 participants.</span>
+                <span data-tr>15 yıllık bir kanser çalışması için bir veri giriş sistemi tasarladım, 10.000 katılımcı üzerinde 30M+ kaydı işledim.</span>
+              </li>
+              <li>
+                <span data-en>Enabled precise reporting for researchers — the project that sparked deep SQL Server expertise.</span>
+                <span data-tr>Araştırmacılar için kesin raporlama imkanı sundum — SQL Server uzmanlığıma yol açan proje.</span>
+              </li>
             </ul>
           </div>
         </div>
@@ -949,16 +1092,16 @@
   <section id="contact">
     <div class="container">
       <div class="contact-inner">
-        <div class="contact-eyebrow reveal">04 — Contact</div>
+        <div class="contact-eyebrow reveal">04 — <span data-en>Contact</span><span data-tr>İletişim</span></div>
         <h2 class="contact-heading reveal reveal-delay-1">
-          Let's build<br/><em>something great.</em>
+          <span data-en>Let's build<br/><em>something great.</em></span><span data-tr>Birlikte<br/><em>harika şeyler inşa edelim.</em></span>
         </h2>
         <p class="contact-desc reveal reveal-delay-2">
-          Open to freelance projects, consulting engagements, and remote-first full-time roles.
-          If you're building something ambitious and need someone who's done it before — let's talk.
+          <span data-en>Open to freelance projects, consulting engagements, and remote-first full-time roles. If you're building something ambitious and need someone who's done it before — let's talk.</span>
+          <span data-tr>Freelance projeler, danışmanlık ve uzaktan tam zamanlı roller için açığım. Iddialı bir şey inşa ediyorsanız ve daha önce yapmış birini arıyorsanız — konuşalım.</span>
         </p>
         <div class="contact-links reveal reveal-delay-3">
-          <a href="mailto:goudarzj@gmail.com" class="contact-link">✉ Email</a>
+          <a href="mailto:goudarzj@gmail.com" class="contact-link">✉ <span data-en>Email</span><span data-tr>E-posta</span></a>
           <a href="https://www.linkedin.com/in/goudarz-javadi-zadeh/" target="_blank" class="contact-link">in LinkedIn</a>
           <a href="https://github.com/GoudarzJ" target="_blank" class="contact-link">⌥ GitHub</a>
         </div>
@@ -969,7 +1112,7 @@
   <!-- FOOTER -->
   <footer>
     <span>© 2026 <span class="footer-gold">Goudarz Javadi Zadeh</span></span>
-    <span>Crafted with obsession — Istanbul, TR</span>
+    <span><span data-en>Crafted with obsession</span><span data-tr>Takıntıyla geliştirildi</span> — Istanbul, TR</span>
   </footer>
 
   <script>
@@ -1231,6 +1374,19 @@
       const w = bar.style.width; bar.style.width = '0';
       setTimeout(() => bar.style.width = w, 500);
     });
+  </script>
+
+  <script>
+    function setLang(lang) {
+      document.body.classList.toggle('lang-tr', lang === 'tr');
+      document.querySelectorAll('.lang-btn').forEach(btn => {
+        btn.classList.toggle('active', btn.textContent.trim().toLowerCase() === lang);
+      });
+      localStorage.setItem('preferred-lang', lang);
+    }
+    // Restore saved preference
+    const saved = localStorage.getItem('preferred-lang');
+    if (saved) setLang(saved);
   </script>
 </body>
 </html>
